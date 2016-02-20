@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - Free monads</title>
+        <link rel="stylesheet" type="text/css" href="../css/tufte.css" />
+    </head>
+
+    <body>
+        <main role="main">
+            <article class="row article post" role="article">
+                <div class="cell">
+                    <header class="row">
+  <div class="home">
+    <a href="../">Home</a>
+  </div>
+</header>
+       <h1>Free monads</h1> 
+       <div class="info">
+         <i>January 16, 2016</i>
+       </div>
+       <p>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                displayAlign: "left",
+                showProcessingMessages: false,
+                showMathMenu: true,
+                messageStyle: "none",
+                TeX: { TagSide: "left", equationNumbers: { autoNumber: "AMS" } }
+            });
+        </script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+        </script>
+
+<h2 id="forgetting-how-to-multiply">Forgetting how to multiply</h2>
+<p>It’s probably easiest to understand what a free monad is if we first understand forgetful functors<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
+<p>In category theory, a functor maps between categories, mapping objects to objects and morphisms to morphisms in a way that preserves compositionality<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>A <em>forgetful functor</em> is just a functor that discards some of the structure or properties of the input category.</p>
+<p>For example, unital rings have objects \((R, +, \cdot, 0, 1)\), where \(R\) is a set, and \((+, \cdot)\) are binary operations with identity elements \((0, 1)\) respectively.</p>
+<p>Let’s denote the category of all unital rings and their homomorphisms by \(\bf{Ring}\), and the category of all non-unital rings and their homomorphisms with \(\bf{Rng}\). We can now define a forgetful functor: \(\it{I}: \bf{Ring} \rightarrow \bf{Rng}\), which just drops the multiplicative identity.</p>
+<p>Similarly, we can define another forgetful functor \(\it{A}: \bf{Rng} \rightarrow \bf{Ab}\), which maps from the category of rngs to the category of abelian groups. \(\it{A}\) discards the multiplicative binary operation, simply mapping all morphisms of multiplication to morphisms of addition.</p>
+<h2 id="forgetting-monoids">Forgetting monoids</h2>
+<p>The forgetful functor \(\it{A}\) forgets ring multiplication. What happens if instead you forget addition? You get monoids! We can define monoids as the triple \((S, \cdot, e)\), where \(S\) is a set, \(\cdot\) is an associative binary operation, and \(e\) is the neutral element of that operation.</p>
+<p>The forgetful functor \(\it{M}: \bf{Ring} \rightarrow \bf{Mon}\) maps from the category of rings to the category of monoids, \(\bf{Mon}\), in which the objects are monoids, and the morphisms are monoid homomorphisms.</p>
+<p>Monoid homomorphisms map between monoids in a way that preserves their monoidal properties. Given \(\mathcal{X}\), a monoid defined by \((X, *, e)\), and \(\mathcal{Y}\), a monoid defined by \((Y, *’, f)\), a function \(\it{\phi}: \mathcal{X} \rightarrow \mathcal{Y}\) from \(\mathcal{X}\) to \(\mathcal{Y}\) is a monoid homomorphism iff:</p>
+<p>it preserves compositionality<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>:</p>
+<p><br /><span class="math">$$\begin{equation}\phi(a * b) = \phi(a) *' \phi(b), \forall a\; b \in \mathcal{X}\end{equation}$$</span><br /></p>
+<p>and maps the identity element: <br /><span class="math">$$\begin{equation}\phi(e) = f\end{equation}$$</span><br /></p>
+<p>Translating into Haskell, if <code>phi</code> is a monoid homomorphism between monoid <code>X</code> to monoid <code>Y</code>, then:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">phi (mappend a b) <span class="fu">==</span> mappend (phi a) (phi b)  <span class="co">-- (1)</span>
+
+phi (<span class="ot">mempty ::</span> <span class="dt">X</span>) <span class="fu">==</span><span class="ot"> mempty ::</span> <span class="dt">Y</span>              <span class="co">-- (2)</span></code></pre></div>
+<p>For example, we can define a monoid homomorphism that maps from the list monoid to the <code>Sum</code> monoid, the monoid formed from the natural numbers under addition:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Monoid</span>
+
+<span class="ot">listToSum ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Sum</span> <span class="dt">Int</span>
+listToSum <span class="fu">=</span> <span class="dt">Sum</span> <span class="fu">.</span> length</code></pre></div>
+<p>If it’s too difficult (or we can’t be bothered) to derive a formal proof, we can use <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a> to test properties of functions. Let’s quickly check if <code>listToSum</code> is actually a monoid homomorphism:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Test.QuickCheck</span>
+
+<span class="co">-- (1)</span>
+<span class="ot">homomorphism ::</span> [()] <span class="ot">-&gt;</span> [()] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+homomorphism a b <span class="fu">=</span>
+  phi (mappend a b) <span class="fu">==</span> mappend (phi a) (phi b)
+    <span class="kw">where</span> phi <span class="fu">=</span> listToSum
+
+quickCheck homomorphism
+<span class="co">-- &gt; OK, passed 100 tests.</span>
+
+<span class="co">-- (2)</span>
+listToSum (<span class="ot">mempty ::</span> [a]) <span class="fu">==</span><span class="ot"> mempty ::</span> <span class="dt">Sum</span> <span class="dt">Int</span>
+<span class="co">-- &gt; True</span></code></pre></div>
+<p>Let’s forget some more things with yet another forgetful functor, \(\it{U}: \bf{Mon} \rightarrow \bf{Set}\)<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>.</p>
+<p>\(\bf{Set}\) is a category where the objects are sets, and the arrows are just plain functions. So \(\it{U}\) will map every monoid in \(\bf{Mon}\) to its underlying set, and every monoid homomorphism to a plain function.</p>
+<p><code>Sum Int</code> would just become <code>Int</code>, <code>listToSum</code> would just become <code>length</code>, <code>mappend :: Sum a</code> would map to <code>(+)</code>, and so on. We forget that any of these things formed a monoid.</p>
+<h2 id="natural-transformations">Natural Transformations</h2>
+<p>Moving our discussion from forgetful functors to free constructions requires the concept of natural transformations. Recall that a functor \(F: \cal{C} \rightarrow \cal{D}\) must take all objects \(X \in \cal{C}\) to \(F(X) \in \cal{D}\), and all morphisms \(f: X \rightarrow Y \in \cal{C}\) to \(F(f): F(X) \rightarrow F(Y) \in \cal{D}\), such that the following diagram commutes:</p>
+<p><br /><span class="math">$$\require{AMScd} \begin{CD} X @&gt;{f}&gt;&gt; Y\\ @V{F}VV @VV{F}V \\ F(X) @&gt;{F(f)}&gt;&gt; F(Y)\end{CD}$$</span><br /></p>
+<p>This diagram says that it doesn’t matter if we start with \(X\), apply \(F\) and then \(F(f)\), or start with \(X\) and instead apply \(f\) and then \(F\)- we always end up with \(F(Y)\). The functor has mapped between categories in a way that preserves the internal structure of the original category.</p>
+<p>A <em>natural transformation</em> is a similar sort of structure-preserving<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> mapping, except instead of mapping between categories, it maps between functors.</p>
+<p>Given functors \(F, G: \cal{C} \rightarrow \cal{D}\), a natural transformation \(\eta\) is a morphism between functors such that:</p>
+<ol style="list-style-type: decimal">
+<li><p>For all \(X \in \mathcal{C}\), there exists a morphism, \(\eta_{X}: F(X) \rightarrow G(X)\), where \(F(X), F(G) \in \mathcal{D}\)<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a></p></li>
+<li><p>For every morphism \(f: X \rightarrow Y \in \mathcal{C}\), the following diagram- a <em>naturality square</em>- commutes:</p></li>
+</ol>
+<p><br /><span class="math">$$\require{AMScd} \begin{CD} F(X) @&gt;{F(f)}&gt;&gt; F(Y)\\ @V{\eta_{X}}VV @VV{\eta_{Y}}V \\ G(X) @&gt;{G(f)}&gt;&gt; G(Y)\end{CD}$$</span><br /></p>
+<p>This means we’re making a rather strong claim about the properties of \(\eta\): \(G(f) \circ \eta\) is the same as \(\eta \circ F(f)\)!</p>
+<h2 id="adjunctions">Adjunctions</h2>
+<p>Let’s consider two functors going in opposite directions, \(\it{F}: \mathcal{C} \rightarrow \mathcal{D}\) and \(\it{G}: \mathcal{D} \rightarrow \mathcal{C}\).</p>
+<p>\(F\) and \(G\) aren’t just any old functors though- they’re equipped with a <em>natural isomorphism</em>:</p>
+<p><br /><span class="math">$$\alpha: \cal{D}\textrm{(}\it{FX, Y}\textrm{)} \cong \cal{C}\textrm{(}\it{X, GY}\textrm{)}$$</span><br /></p>
+<p>where the isomorphism is natural in \(X\) and \(Y\).</p>
+<p>Simply saying these hom-sets are naturally isomorphic is rather imprecise. We can pin down the naturality of \(\alpha\) by saying that certain natural transformations hold. But to define a natural transformation we need to define some functors!</p>
+<p>We can define a natural transformation between these hom-functors from \(X \in \mathcal{C}\) to \(Y \in \cal{D}\), fixing \(Y\):</p>
+<p><br /><span class="math">$$\cal{D}\textrm{(}\it{F\_, Y}\textrm{)}$$</span><br /></p>
+<p><br /><span class="math">$$\cal{D}\textrm{(}\it{\_, GY}\textrm{)}$$</span><br /></p>
+<p>We can use another notation to make their functorish nature more apparent:</p>
+<p><br /><span class="math">$$X \mapsto \textrm{hom}(FX, Y): \cal{C}^{op} \rightarrow \bf{Set}$$</span><br /></p>
+<p><br /><span class="math">$$X \mapsto \textrm{hom}(X, GY): \cal{C}^{op} \rightarrow \bf{Set}$$</span><br /></p>
+<p>These functors take every object \(X \in \mathcal{C}^{op}\) to a hom-set of morphisms in \(\cal{D}\), so it’s perfectly valid to ask for a natural transformation between them:</p>
+<p><br /><span class="math">$$\require{AMScd} \begin{CD} \cal{D}\textrm{(}\it{FX^{\prime},Y}\textrm{)}@&gt;{\alpha}&gt;&gt; \cal{C}\textrm{(}\it{X^{\prime}, GY}\textrm{)} \\ @V{\_ \circ Ff}VV @VV{\_ \circ f}V \\ \cal{D}\textrm{(}\it{FX,Y}\textrm{)} @&gt;{\alpha}&gt;&gt; \cal{C}\textrm{(}\it{X, GY}\textrm{)} \end{CD}$$</span><br /></p>
+<p>So for every morphism \(f: X^{\prime} \rightarrow X \in \cal{C}\), applying \(\alpha\) and then precomposing with \(f\) is the same as precomposing with \(Ff\) and then applying \(\alpha\). That’s naturality in \(X\). Naturality in \(Y\) is much the same, except we fix \(X\), and get functors from \(\cal{D} \rightarrow \bf{Set}\):</p>
+<p><br /><span class="math">$$\require{AMScd} \begin{CD} \cal{D}\textrm{(}\it{FX,Y}\textrm{)}@&gt;{\alpha}&gt;&gt; \cal{C}\textrm{(}\it{X, GY}\textrm{)} \\ @V{g \circ \_}VV @VV{Gg \circ \_}V \\ \cal{D}\textrm{(}\it{FX,Y^{\prime}}\textrm{)} @&gt;{\alpha}&gt;&gt; \cal{C}\textrm{(}\it{X, GY^{\prime}}\textrm{)} \end{CD}$$</span><br /></p>
+<p>for all mophisms \(g: Y \rightarrow Y^{\prime} \in \cal{D}\).</p>
+<p>We can think of \(\alpha\) as a pair of hom-functors<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> that take \(\mathcal{C}^{op} \rightarrow \bf{Set}\), and a pair of functors that take \(\cal{D} \rightarrow \bf{Set}\), such that each pair of functors creates a bijection between their corresponding sets, satisfying the above naturality conditions.</p>
+<p>We describe this functorial relationship by saying that \(F\) is <em>left adjoint</em> to \(G\), or \(F \dashv G\).</p>
+<h2 id="free-monoids">Free monoids</h2>
+<p>Armed with the ability to talk about the “adjointness” of functors, we can now examine what happens when we take \(U\) to be a forgetful functor, when \(F \dashv U\).</p>
+<p>If \(U\) is a forgetful functor that discards some information about its domain, \(F\) must be able to “reconstruct” enough to go from \(D\) to \(C\). The left adjoint to a forgetful functor is always a free functor!</p>
+<p>Returning to our monoid example, if we take \(U\) to be \(U: \bf{Mon} \rightarrow \bf{Set}\), the left adjoint to \(U\) is the free functor \(F: \bf{Set} \rightarrow \bf{Mon}\).</p>
+<p>This means there must be a natural isomorphism, \(\alpha\), that creates a bijection between hom-sets of \(F\) and \(U\), such that all functions \(a \in \bf{Set}\) to an underlying set of \(\bf{Mon}\) uniquely determines a monoid homomorphism that’s natural in \(a\) and \(b\):</p>
+<p><br /><span class="math">$$\alpha: \bf{Mon}\textrm{(}\it{Fa} \rightarrow b) \cong \bf{Set}\textrm{(}\it{a} \rightarrow \it{Ub}\textrm{)}$$</span><br /></p>
+<p>and vice-versa.</p>
+<p>How could we construct \(F\) so that the above conditions are met? Spoiler alert: we can just use List! Let’s try to translate \(\alpha\), and its inverse, into pseudo-Haskell<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Just delete the monoid constraint</span>
+<span class="ot">u ::</span> <span class="dt">Monoid</span> m <span class="fu">=</span> m
+
+<span class="ot">alpha ::</span> (<span class="dt">List</span> a <span class="ot">-&gt;</span> <span class="dt">Monoid</span> m) <span class="fu">=</span> (a <span class="ot">-&gt;</span> u (<span class="dt">Monoid</span> m))
+
+<span class="ot">alpha' ::</span> (a <span class="ot">-&gt;</span> u (<span class="dt">Monoid</span> m)) <span class="ot">-&gt;</span> (<span class="dt">List</span> a <span class="ot">-&gt;</span> <span class="dt">Monoid</span> m)</code></pre></div>
+<p>Now we can translate this into actual Haskell<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>. Since <code>u</code> just removes the monoid constraint, we can substitute all instances of <code>u (Monoid m)</code> with simply <code>m</code>, and we can use the real list constructor and type constraint syntax:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Monoid</span>
+
+<span class="ot">alpha ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> ([a] <span class="ot">-&gt;</span> m)
+alpha g xs <span class="fu">=</span> mconcat <span class="fu">$</span> map g xs
+
+<span class="ot">alpha' ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> ([a] <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m)
+alpha' h x <span class="fu">=</span> h [x]</code></pre></div>
+<p>To prove that <code>alpha</code> actually forms a natural isomorphism, we need to show that <code>alpha . alpha' = id</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Proof that alpha . alpha' = id</span>
+
+alpha <span class="fu">.</span> alpha'
+<span class="co">-- eta expand</span>
+<span class="fu">=</span> \h x <span class="ot">-&gt;</span> alpha (alpha' h) x
+
+<span class="co">-- substitute definition of alpha'</span>
+<span class="fu">=</span> \h x <span class="ot">-&gt;</span> alpha h [x]
+
+<span class="co">-- substitute definition of alpha</span>
+<span class="fu">=</span> \h x <span class="ot">-&gt;</span> mconcat (map h [x])
+
+<span class="co">-- map f [x] = [f x]</span>
+<span class="fu">=</span> \h x <span class="ot">-&gt;</span> mconcat ([h x])
+
+<span class="co">-- mconcat [x] = x</span>
+<span class="fu">=</span> \h x <span class="ot">-&gt;</span> h x
+
+<span class="co">-- eta-reduce</span>
+<span class="fu">=</span> \h <span class="fu">=</span> h
+
+<span class="co">-- definition of id</span>
+<span class="fu">=</span> id</code></pre></div>
+<p>and in the other direction, that <code>alpha' . alpha =  id</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Proof that alpha' . alpha = id</span>
+
+alpha' <span class="fu">.</span> alpha
+<span class="co">-- eta-expand</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> alpha' (alpha g) xs
+
+<span class="co">-- substitute definition of alpha</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> mconcat (map (alpha g) xs)
+
+<span class="co">-- eta-expand</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> mconcat (map (\x <span class="ot">-&gt;</span> alpha g x) xs)
+
+<span class="co">-- substitute definition of alpha'</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> mconcat (map (\x <span class="ot">-&gt;</span> g [x]) xs)
+
+<span class="co">-- map (f . g) = map f . map g</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> mconcat (map g (map (\x <span class="ot">-&gt;</span> [x]) xs))
+
+<span class="co">-- free theorem</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> g (mconcat (map (\x <span class="ot">-&gt;</span> [x]) xs))
+
+<span class="co">-- mconcat [[a],[b],[c]] = [a,b,c]</span>
+<span class="fu">=</span> \g xs <span class="ot">-&gt;</span> g xs
+
+<span class="co">-- eta-reduce</span>
+<span class="fu">=</span> \g <span class="ot">-&gt;</span> g
+
+<span class="co">-- definition of id</span>
+<span class="fu">=</span> id</code></pre></div>
+<p>So it follows that the list does indeed form a free monoid! Interestingly, what we’ve already defined as <code>alpha</code> is just <code>foldMap</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">alpha ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> ([a] <span class="ot">-&gt;</span> m)
+
+<span class="ot">foldMap ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> m</code></pre></div>
+<p>So in more Haskellish terms, we map each element of a list to a monoid, and then combine the results using the structure of that monoid.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">foldMap <span class="dt">Product</span> [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>]
+<span class="co">-- Sum {getSum = 12}</span>
+
+foldMap <span class="dt">Product</span> [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>]
+<span class="co">-- Product {getProduct = 48}</span></code></pre></div>
+<p>Of course, <code>foldMap</code> is really defining a monoid homomorphism:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Monoid homomorphisms map the identity element</span>
+foldMap <span class="dt">Product</span> []
+<span class="co">-- Product {getProduct = 1}</span>
+
+foldMap <span class="dt">Sum</span> []
+<span class="co">-- Product {getSum = 0}</span>
+
+<span class="co">-- ...and preserve compositionality</span>
+<span class="ot">homomorphism ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+homomorphism a b <span class="fu">=</span> phi (a <span class="fu">++</span> b) <span class="fu">==</span> phi a <span class="ot">`mappend`</span> phi b
+  <span class="kw">where</span> phi <span class="fu">=</span> foldMap <span class="dt">Sum</span>
+
+quickCheck homomorphism
+<span class="co">-- OK, passed 100 tests.</span></code></pre></div>
+<h2 id="free-monads">Free Monads</h2>
+<p>Now let’s take a look at free monads. Of course, monads are just monoids in the category of endofunctors, so we can apply what we’ve already learned! A monad is an endofunctor \(T: \cal{C} \rightarrow \cal{C}\) equipped with natural transformations \(\eta: 1_{\cal{C}} \Rightarrow T\) and \(\mu: T^{2} \Rightarrow T\), obeying the obvious<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a> axioms of identity and associativity. The \(\bf{Monad}\) category has monads as objects, and monad homomorphisms as arrows.</p>
+<p>We can define a forgetful functor, \(U: \bf{Monad} \rightarrow \bf{End}\), that maps from the category of monads to the category of endofunctors. The category of endofunctors, \(\bf{End}\), has endofunctors as objects and natural transformations as arrows, so \(U\) should be a forgetful functor such that:</p>
+<ul>
+<li>For every monad \(T\), \(U\) will forget \(\eta\) and \(\mu\), and just give us the underlying endofunctor \(T\).</li>
+<li>For every monad homomorphism \(\phi\), \(U\) will give us a natural transformation in \(\bf{End}\).</li>
+</ul>
+<p>Now we can see what behaviour \(F\) should have, when \(F \vdash U\):</p>
+<ul>
+<li>For every endofunctor \(A\), \(F A\) should be a monad.</li>
+<li>For every natural transformation \(\eta: A \Rightarrow B\), \(F \eta\) should be a monad homomorphism.</li>
+<li>The isomorphism \(F A \Rightarrow B \cong A \Rightarrow U B\) should be natural in \(A\) and \(B\).</li>
+</ul>
+<p>Again, this makes very strong claims about the behaviour of \(F\). It turns out that the following construction<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a> satisfies all these criteria:</p>
+<p>We’re effectively asking for the existence of</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Free</span> f a <span class="fu">=</span> <span class="dt">Pure</span> a <span class="fu">|</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f a))
+
+<span class="kw">instance</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span>
+  return a <span class="fu">=</span> <span class="dt">Pure</span> a
+  <span class="dt">Pure</span> a <span class="fu">&gt;&gt;=</span> f <span class="fu">=</span> f a
+  <span class="dt">Free</span> m <span class="fu">&gt;&gt;=</span> f <span class="fu">=</span> <span class="dt">Free</span> (fmap (<span class="fu">&gt;&gt;=</span> f) m)</code></pre></div>
+<p>The monadic bind operation <code>(&gt;&gt;=)</code> can be defined in terms of “substitution followed by renormalization”:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+m <span class="fu">&gt;&gt;=</span> f <span class="fu">=</span> join (fmap f m)</code></pre></div>
+<p>In conventional monads, we substitute the <code>a</code> in our monad <code>m a</code> with <code>m b</code>, to get <code>m m b</code>, and then we renormalize with \(\mu: T^{2} \Rightarrow T\) (which we call <code>join</code> in Haskell) to get <code>m b</code>. Free monads still perform the substitution of the underlying functor, but because <code>Free</code> type is defined recursively as <code>Free (f (Free f a))</code>, we effectively get \(\mu: T^2 \Rightarrow T\) for free by by sticking another layer of <code>Free</code> on top. It’s a lossless process; everything you’ve joined is retained<a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a>. In fact, <code>Free</code> looks suspiciously like <code>List</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">List</span> a <span class="fu">=</span> <span class="dt">Nil</span> <span class="fu">|</span> <span class="dt">Cons</span> (<span class="dt">List</span> a)
+
+<span class="kw">data</span> <span class="dt">Free</span> f a <span class="fu">=</span> <span class="dt">Pure</span> a <span class="fu">|</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f a))</code></pre></div>
+<p>So <code>Free</code> is basically just a list of functors! When we defined the free monoid, the natural isomorphism constraint basically forced us into defining <code>foldMap</code>, which mapped each element of the list to a monoid, and then used the structure of that monoid to join the resulting elements:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">foldMap ::</span> <span class="dt">Monoid</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> m
+foldMap f xs <span class="fu">=</span> mconcat <span class="fu">$</span> map f xs</code></pre></div>
+<p>Now we’re going to do the same for the free monad, by defining the natural transformation <code>foldFree</code>, and its inverse, <code>foldFree'</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">foldFree ::</span> (<span class="dt">Functor</span> f, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span>
+  (forall a <span class="fu">.</span> f a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> <span class="dt">Free</span> f a <span class="ot">-&gt;</span> m a
+<span class="ot">foldFree' ::</span> (<span class="dt">Functor</span> f, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> 
+  (forall a <span class="fu">.</span> <span class="dt">Free</span> f a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> m a</code></pre></div>
+<p>Doing that is as simple as following the types:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">foldFree _ (<span class="dt">Pure</span> x) <span class="fu">=</span> return x
+foldFree phi (<span class="dt">Free</span> xs) <span class="fu">=</span> join <span class="fu">$</span> phi <span class="fu">$</span> fmap (foldFree phi) xs
+
+foldFree' psi <span class="fu">=</span> psi <span class="fu">.</span> <span class="dt">Free</span> <span class="fu">.</span> (fmap <span class="dt">Return</span>)</code></pre></div>
+<p>Proving that <code>foldFree . foldFree' = id</code> is left as an exercise for the reader.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>As far as I understand, there’s no formal way of describing the “forgetfulness” of a functor.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>A functor “preserves compositionality” if two morphisms of the input category compose to form a third morphism, such that the image of those two morphisms under the functor also compose to form the image of the third morphism.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>All homomorphisms have one constraint in common: they must preserve compositionality. We can be generalise the homomorphism constraint for any \(n\)-ary operation; a function \(\it{f}: A \rightarrow B\) is a homomorphism between two algebraic structures of the same type if: <br /><span class="math">$$\it{f}(\mu_{A}(a_{1}, \ldots, a_{n})) = \mu_{B}(f(a_{1}), \ldots, f(a_n))$$</span><br /> for all \(a_{1}, \ldots, a_{n} \in A\)<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Technically, in Haskell we’d be mapping to the category \(\bf{Hask}\), the category of Haskell types.<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>It’s actually exactly the same kind of structure preservation, because functors form a category where the objects are functors and the morphisms are natural transformations.<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>We call \(\eta_{X}\) “the component of \(\eta\) at \(X\)”<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Category theory brings a great richness of perspectives, allowing us to think about relationships in whatever way that happen to suit whatever we’re trying to talk about.<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>I’m not sure of a way to write a polymorphic function that “forgets” a monoid constraint, so we’ll just wave our hands a bit until we get to Real Haskell.<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>This might look a bit strange- even though we’ve supposedly “forgotten” that <code>m</code> is a monoid in <code>alpha'</code>, the type variable <code>m</code> is still bound by the monoid type constraint. We can cheat, though, and explicitly parameterize a forgetful function <code>Monoid m =&gt; m -&gt; b</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">alpha <span class="dt">Monoid</span> m<span class="ot">=&gt;</span>(b<span class="ot">-&gt;</span>m)<span class="ot">-&gt;</span>(a<span class="ot">-&gt;</span>b)<span class="ot">-&gt;</span>([a]<span class="ot">-&gt;</span>m)
+alpha m g xs <span class="fu">=</span> mconcat <span class="fu">$</span> map (m <span class="fu">.</span> g) xs
+
+alpha' <span class="dt">Monoid</span> m<span class="ot">=&gt;</span>(m<span class="ot">-&gt;</span>b)<span class="ot">-&gt;</span>([a]<span class="ot">-&gt;</span>m)<span class="ot">-&gt;</span>(a<span class="ot">-&gt;</span>b)
+alpha' m h x <span class="fu">=</span> m <span class="fu">.</span> h <span class="fu">$</span> [x]</code></pre></div>
+<a href="#fnref9">↩</a></li>
+<li id="fn10"><p>Obvious to experienced category theorists, at least.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>The way this construction defines the bind operator results in a quadratic asymtotic complexity. Janis Voigtlander describes an approach for reducing the asymtotic complexity to linear in his paper <em><a href="http://www.janis-voigtlaender.eu/papers/AsymptoticImprovementOfComputationsOverFreeMonads.pdf">Asymtotic Improvement of Computations over Free Monads</a></em>.<a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p>This gives an intuition for why any natural transformation between endofunctors, \(f: A \Rightarrow UB\), can be fed to the free functor to form a monad homomorphism, \(Ff: FA \Rightarrow B\). Just like the free monoid, we don’t “throw away” any information about the free construction beyond what’s defined by the underlying category.<a href="#fnref12">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js">
+        </script>
+<script type="text/javascript" src="../css/footnote.js">
+</script>
+
+            <div id="footer">
+              <small>Site proudly generated by
+                <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+            </div>
+                </div>
+            </article>
+        </main>
+    </body>
+
+    </html>
