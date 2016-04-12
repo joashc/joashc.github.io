@@ -153,9 +153,10 @@
 <p><code>xautolock</code> checks if there isn’t any X Window activity within a certain interval, then calls an arbitrary command. I tried it out:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">xautolock</span> -time 2 -corners x-xx -locker <span class="st">"systemctl suspend"</span></code></pre></div>
 <p>The <code>-corners x-xx</code> parameter meant that moving the mouse into the top right-hand corner would disable the autosuspend, which I thought would be pretty useful for watching videos.</p>
-<p>This worked fine, except that I’d be looking at something for a little while, and my computer would suddenly suspend itself. Fortunately, <code>xautolock</code> has a <code>-notify</code> flag, which lets you run a command some interval before the actual suspend.</p>
+<p>This worked fine, except that I’d be looking at something for a little while, and if I didn’t touch my mouse or keyboard, my computer would suddenly suspend itself. Fortunately, <code>xautolock</code> has a <code>-notify</code> flag, which lets you run a command some interval before the actual suspend.</p>
 <p>Some people had the <code>-notify</code> set up for a <code>notify-send</code> call, but I didn’t want to start using an entire notification system just for getting notified of an impending standby, and the notification systems I did try didn’t play very nicely with i3.</p>
 <p>I decided to keep looking.</p>
+<!--more-->
 <h2 id="attempt-2-xautolock-and-brightd">Attempt 2: <code>xautolock</code> and <code>brightd</code></h2>
 <p><code>brightd</code> is a daemon that can dim your display once you’re idle for a certain period of time. This sounded like how Macbooks and smartphones work, and it’s a natural and unobtrusive way of signalling an impending suspend. But when I tried it out, nothing happened. I tried setting the brightness manually:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">tee</span> /sys/class/backlight/acpi_video0/brightness <span class="kw">&lt;&lt;&lt;</span> 50</code></pre></div>
