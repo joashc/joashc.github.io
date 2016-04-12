@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
+    <script src="https://use.typekit.net/geg0pqq.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Macbook-style Suspend on Linux</title>
+    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-adobe-garamond-pro{font-family:"adobe-garamond-pro",sans-serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/ee6a48/1w;adobe-garamond-pro,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,Xs1:W:i4,Xs2:W:n4,Xrz:W:n7/k?3bb2a6e53c9684ffdc9a9aff1d5b2a62de246c40fc2071e052ac61ed39dbb7bdfa68192f9a86ce4374a9c8e19c7f4d236834b42ff893f3cac65f10f7e33d50f2b872d0a4d446880f7ffa35227c30507ea59d6633b8866c87443c456db90fc8e1a8" media="all">
+  </head>
+
+  <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
+.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
+.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
+.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
+.mjx-math * {display: inline-block; text-align: left}
+.mjx-numerator {display: block; text-align: center}
+.mjx-denominator {display: block; text-align: center}
+.MJXc-stacked {height: 0; position: relative}
+.MJXc-stacked > * {position: absolute}
+.MJXc-bevelled > * {display: inline-block}
+.mjx-stack {display: inline-block}
+.mjx-op {display: block}
+.mjx-under {display: table-cell}
+.mjx-over {display: block}
+.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-stack > .mjx-sup {display: block}
+.mjx-stack > .mjx-sub {display: block}
+.mjx-prestack > .mjx-presup {display: block}
+.mjx-prestack > .mjx-presub {display: block}
+.mjx-delim-h > .mjx-char {display: inline-block}
+.mjx-surd {vertical-align: top}
+.mjx-mphantom * {visibility: hidden}
+.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
+.mjx-annotation-xml {line-height: normal}
+.mjx-menclose > svg {fill: none; stroke: currentColor}
+.mjx-mtr {display: table-row}
+.mjx-mlabeledtr {display: table-row}
+.mjx-mtd {display: table-cell; text-align: center}
+.mjx-label {display: block}
+.mjx-box {display: inline-block}
+.mjx-block {display: block}
+.mjx-span {display: span}
+.mjx-char {display: block; white-space: pre}
+.mjx-itable {display: inline-table}
+.mjx-row {display: table-row}
+.mjx-cell {display: table-cell}
+.mjx-table {display: table; width: 100%}
+.mjx-line {display: block; height: 0}
+.mjx-strut {width: 0; padding-top: 1em}
+.mjx-vsize {width: 0}
+.MJXc-space1 {margin-left: .167em}
+.MJXc-space2 {margin-left: .222em}
+.MJXc-space3 {margin-left: .278em}
+.mjx-ex-box-test {position: absolute; width: 1px; height: 60ex}
+.MJXc-TeX-unknown-R {font-family: monospace; font-style: normal; font-weight: normal}
+.MJXc-TeX-unknown-I {font-family: monospace; font-style: italic; font-weight: normal}
+.MJXc-TeX-unknown-B {font-family: monospace; font-style: normal; font-weight: bold}
+.MJXc-TeX-unknown-BI {font-family: monospace; font-style: italic; font-weight: bold}
+.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
+.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
+.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
+.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
+.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
+.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
+.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
+.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
+.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
+.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
+.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
+.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
+.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
+.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
+.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
+.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
+.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
+.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
+.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
+@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
+@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
+@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
+@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
+@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
+@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
+@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
+@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
+@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
+@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
+@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
+@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
+@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
+@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
+@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
+@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
+@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
+@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
+@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
+@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
+@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
+@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
+@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
+@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
+</style>
+    <main role="main">
+    <article class="row article post" role="article">
+      <div class="cell">
+        <header class="row">
+          <div class="home">
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
+          </div>
+        </header>
+          <h1 class="preview-title">Macbook-style Suspend on Linux</h1> 
+<div class="preview-info">
+
+<div><i>July  2, 2015</i></div>
+</div>
+<p>
+
+</p><h2 id="macbook-envy">Macbook envy</h2>
+<p>Macbooks enter suspend really gracefully, which is something I never really missed on my Arch box until I actually started using suspend<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Here’s how I got my computer to:</p>
+<ul>
+<li><p>Dim the display twenty seconds before suspend</p></li>
+<li><p>Cancel dimming and suspend if any mouse or keyboard input was detected during that twenty seconds</p></li>
+<li><p>Not dim/suspend if there was any sound playing</p></li>
+</ul>
+<h2 id="how-even-do-you-suspend">How even do you suspend?</h2>
+<p>A quick trip to the Arch wiki tells me that suspend works out of the box with a <code>systemctl suspend</code>. That was great, but I didn’t want to manually put my computer to sleep every time I thought I wouldn’t be using it for a little while.</p>
+<h2 id="attempt-1-xautolock">Attempt 1: <code>xautolock</code></h2>
+<p><code>xautolock</code> checks if there isn’t any X Window activity within a certain interval, then calls an arbitrary command. I tried it out:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">xautolock</span> -time 2 -corners x-xx -locker <span class="st">"systemctl suspend"</span></code></pre></div>
+<p>The <code>-corners x-xx</code> parameter meant that moving the mouse into the top right-hand corner would disable the autosuspend, which I thought would be pretty useful for watching videos.</p>
+<p>This worked fine, except that I’d be looking at something for a little while, and my computer would suddenly suspend itself. Fortunately, <code>xautolock</code> has a <code>-notify</code> flag, which lets you run a command some interval before the actual suspend.</p>
+<p>Some people had the <code>-notify</code> set up for a <code>notify-send</code> call, but I didn’t want to start using an entire notification system just for getting notified of an impending standby, and the notification systems I did try didn’t play very nicely with i3.</p>
+<p>I decided to keep looking.</p>
+<h2 id="attempt-2-xautolock-and-brightd">Attempt 2: <code>xautolock</code> and <code>brightd</code></h2>
+<p><code>brightd</code> is a daemon that can dim your display once you’re idle for a certain period of time. This sounded like how Macbooks and smartphones work, and it’s a natural and unobtrusive way of signalling an impending suspend. But when I tried it out, nothing happened. I tried setting the brightness manually:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">tee</span> /sys/class/backlight/acpi_video0/brightness <span class="kw">&lt;&lt;&lt;</span> 50</code></pre></div>
+<p>…and nothing happened either. Maybe it only works on laptops, or maybe it was because I use a TV as my monitor. Sure enough, running <code>xbacklight</code> just gave me the sad message:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">&gt;</span> <span class="kw">xbacklight</span>
+<span class="st">"No outputs have backlight property."</span></code></pre></div>
+<h2 id="attempt-3-xcalib-and-xautolock">Attempt 3: <code>xcalib</code> and <code>xautolock</code></h2>
+<p><code>xcalib</code> allows you to set the brightness/contrast of your display, and it’s purely a software implementation, so it shouldn’t be affected by backlight properties and whatnot. I tried changing the contrast:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">xcalib</span> -co 60 -a</code></pre></div>
+<p>…and it looked almost exactly how I wanted it to. The only problem was that it would persist these changes and then exit, requiring another call to <code>xcalib -clear</code> to reset the contrast levels. <code>xautolock</code> would correctly notify me of a suspend by dimming the screen, but cancelling the suspend would leave me stuck with a dim monitor.</p>
+<p>I stared at the flags for <code>xautolock</code> for a while, but there didn’t seem to be any flag that would be called once you reset the idle timer.</p>
+<h2 id="attempt-4-xcalib-and-xprintidle">Attempt 4: <code>xcalib</code> and <code>xprintidle</code></h2>
+<p>It looked as though I’d have to check the idle myself, so I starting writing a shell script that used <code>xprintidle</code>, a utility that prints the milliseconds you’ve been idle for:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># Check initial idle</span>
+<span class="ot">initial_idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+
+<span class="co"># Dim the screen if we've been idle for more than 2 minutes</span>
+<span class="kw">if [</span> <span class="st">"</span><span class="ot">$initial_idle</span><span class="st">"</span> <span class="ot">-gt</span> 120000<span class="kw"> ]</span>; <span class="kw">then</span>
+  <span class="kw">echo</span> <span class="st">"Dimming screen"</span>
+  <span class="kw">xcalib</span> -co 60 -a
+
+  <span class="ot">idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+  <span class="co"># Keep looping if we're still idle</span>
+  <span class="kw">while [</span> <span class="st">"</span><span class="ot">$idle</span><span class="st">"</span> <span class="ot">-gt</span> 2000<span class="kw"> ]</span>
+  <span class="kw">do</span>
+    <span class="ot">idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+
+    <span class="co"># Suspend 20 seconds after screen dims</span>
+    <span class="kw">if [</span> <span class="st">"</span><span class="ot">$idle</span><span class="st">"</span> <span class="ot">-gt</span> <span class="ot">$(($initial_idle</span> + 20000<span class="ot">))</span><span class="kw"> ]</span>;
+    <span class="kw">then</span>
+      <span class="kw">echo</span> <span class="st">"Suspending"</span>
+      <span class="kw">systemctl</span> suspend
+    <span class="kw">fi</span>
+    <span class="kw">sleep</span> 0.1
+  <span class="kw">done</span>
+
+  <span class="co"># Reset the display contrast once user activity is detected</span>
+  <span class="kw">xcalib</span> -clear
+<span class="kw">fi</span></code></pre></div>
+<p>It worked! Every time the script is called, we just check if we’ve been idle for more than two minutes, then dim the screen. After twenty seconds of this dim-screen warning, we suspend. If we make any user input before the twenty seconds, it’ll reset the idle timer, and we’ll set the screen back to full contrast.</p>
+<p>Now we just need to set up a cron job, and we’re done!</p>
+<h2 id="attempt-5-cron">Attempt 5: <code>cron</code></h2>
+<p>I set up the cronjob, and… it didn’t work. Right, the script’s probably not executable:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">chmod</span> 600 suspend.sh</code></pre></div>
+<p>…still nothing. Let’s echo out some things to see what’s going on.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">initial_idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+
+<span class="kw">echo</span> <span class="st">"</span><span class="ot">$initial_idle</span><span class="st">"</span></code></pre></div>
+<p>Run it from the shell, and it gives me this output:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">2</span></code></pre></div>
+<p>…but when I log the cronjob output, I get absolutely nothing. This kind of disparity between your shell and cron usually means that there’s something missing from cron’s rather sparse environment.</p>
+<p>A bit of Googling revealed that the display environment variable was missing, so I added that in:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">export</span> <span class="ot">DISPLAY=</span>:0</code></pre></div>
+<p>…and it worked! The fact that cron only runs every minute meant the job would be delayed up to a minute, but I was fine with that.</p>
+<p>Well, it half worked. It dimmed the screen alright, but it didn’t enter suspend. I suspected it was because calling <code>systemctl suspend</code> from cron would require root permissions, so I set up a root crontab that called <code>systemctl suspend</code>, and the computer suspended. I really didn’t want to run this script as root, so…</p>
+<h2 id="attempt-6-systemd">Attempt 6: <code>systemd</code></h2>
+<p><code>systemd</code> has timers, which are basically cronjobs, but better<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>:</p>
+<ul>
+<li><p>Timers are decoupled from services, so you can run multiple services from one timer definition.</p></li>
+<li><p>This decoupling also lets you run the service on demand, without waiting for the timer<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p></li>
+</ul>
+<ul>
+<li>All output is pushed to the systemd journal, so you can do stuff like:</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">journalctl</span> -u suspend --since <span class="st">"5 min ago"</span></code></pre></div>
+<ul>
+<li>You have more options for the service environment, instead of the just getting the barebones <code>cron</code> env. This is what let us run <code>systemctl suspend</code> without any issues.</li>
+</ul>
+<p>We basically just create <code>/etc/systemd/system/suspend.timer</code>:</p>
+<div class="sourceCode"><pre class="sourceCode ini"><code class="sourceCode ini"><span class="kw">[Unit]</span>
+<span class="dt">Description</span><span class="ot">=</span><span class="st">Suspend if user is idle</span>
+
+<span class="kw">[Timer]</span>
+<span class="dt">OnCalendar</span><span class="ot">=</span><span class="st">minutely</span>
+
+<span class="kw">[Install]</span>
+<span class="dt">WantedBy</span><span class="ot">=</span><span class="st">timers.target</span></code></pre></div>
+<p>And <code>/etc/systemd/system/suspend.service</code>:</p>
+<div class="sourceCode"><pre class="sourceCode ini"><code class="sourceCode ini"><span class="kw">[Unit]</span>
+<span class="dt">Description</span><span class="ot">=</span><span class="st">Suspend if user is idle</span>
+
+<span class="kw">[Service]</span>
+<span class="dt">Environment</span><span class="ot">=</span><span class="st">"DISPLAY=:</span><span class="dv">0</span><span class="st">"</span>
+<span class="dt">ExecStart</span><span class="ot">=</span><span class="st">~/dotfiles/suspend.sh</span></code></pre></div>
+<p>We can test out the service:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">systemctl</span> start suspend</code></pre></div>
+<p>and enable the timer with:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">systemctl</span> enable suspend.timer</code></pre></div>
+<p>All was well.</p>
+<h2 id="videos">Videos</h2>
+<p>I was pretty satisfied, so I decided to take a break and watch some <em>South Park</em>. Two minutes in, everything dimmed, and I had to scramble to stop the computer from suspending.</p>
+<p>This just wouldn’t do, so I investigated some methods for detecting fullscreen video playing, but they seemed sort of hacky, requiring you to maintain some whitelist of windows that played video. It would probably be easier to check if any audio devices are playing:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">grep</span> -r <span class="st">"RUNNING"</span> /proc/asound <span class="kw">|</span> <span class="kw">wc</span> -l</code></pre></div>
+<p>This gave me <code>0</code> if no sound was playing, and <code>1</code> if there was sound playing, or it had just recently stopped. This led to the final iteration of the script, which is also available from my <a href="https://raw.githubusercontent.com/joashc/dotfiles/master/suspend.sh">dotfiles repository</a>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">initial_idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+
+<span class="kw">echo</span> <span class="st">"Initial idle:"</span>
+<span class="kw">echo</span> <span class="st">"</span><span class="ot">$initial_idle</span><span class="st">"</span>
+
+<span class="co"># Dim the screen if there's been no X activity for more than 2 minutes and there's no sound playing</span>
+<span class="kw">if [</span> <span class="st">"</span><span class="ot">$initial_idle</span><span class="st">"</span> <span class="ot">-gt</span> 120000<span class="kw"> ]</span> <span class="kw">&amp;&amp; [</span> <span class="ot">$(</span><span class="kw">grep</span> -r <span class="st">"RUNNING"</span> /proc/asound <span class="kw">|</span> <span class="kw">wc</span> -l<span class="ot">)</span> <span class="ot">-eq</span> 0<span class="kw"> ]</span>; <span class="kw">then</span>
+  <span class="kw">echo</span> <span class="st">"Dimming screen"</span>
+  <span class="kw">xcalib</span> -co 60 -a
+
+  <span class="ot">idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+  <span class="co"># Keep looping if we're still idle</span>
+  <span class="kw">while [</span> <span class="st">"</span><span class="ot">$idle</span><span class="st">"</span> <span class="ot">-gt</span> 2000<span class="kw"> ]</span>
+  <span class="kw">do</span>
+    <span class="ot">idle=$(</span><span class="kw">xprintidle</span> <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span>
+
+    <span class="co"># Suspend 20 seconds after screen dims</span>
+    <span class="kw">if [</span> <span class="st">"</span><span class="ot">$idle</span><span class="st">"</span> <span class="ot">-gt</span> <span class="ot">$(($initial_idle</span> + 20000<span class="ot">))</span><span class="kw"> ]</span>;
+    <span class="kw">then</span>
+      <span class="kw">echo</span> <span class="st">"Suspending"</span>
+      <span class="kw">systemctl</span> suspend
+    <span class="kw">fi</span>
+    <span class="kw">sleep</span> 0.1
+  <span class="kw">done</span>
+
+  <span class="co"># Reset the display contrast once user activity is detected</span>
+  <span class="kw">xcalib</span> -clear
+<span class="kw">fi</span></code></pre></div>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>I started using suspend once one of my electricity bills was a lot higher than I would’ve liked. For some reason, I’d never gotten into the habit of suspending my computer, so that sounded like a pretty good place to start.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>I’m going to stay out of the whole <code>systemd</code> debate otherwise.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>This would have been really useful when I was echoing the cronjob output to a logfile and just sitting in front of <code>tail -f</code>, waiting for the cronjob to go off.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
+
+
+
+
+        <div id="footer">
+          <small>Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+        </div>
+      </div>
+    </article>
+    </main>
+  
+
+</body></html>

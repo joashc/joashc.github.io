@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
+    <script src="https://use.typekit.net/geg0pqq.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pronouncing "Gadsby"</title>
+    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-adobe-garamond-pro{font-family:"adobe-garamond-pro",sans-serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/ee6a48/1w;adobe-garamond-pro,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,Xs1:W:i4,Xs2:W:n4,Xrz:W:n7/k?3bb2a6e53c9684ffdc9a9aff1d5b2a62de246c40fc2071e052ac61ed39dbb7bdfa68192f9a86ce4374a9c8e19c7f4d236834b42ff893f3cac65f10f7e33d50f2b872d0a4d446880f7ffa35227c30507ea59d6633b8866c87443c456db90fc8e1a8" media="only x">
+  </head>
+
+  <body><style id="MathJax_CHTML_styles">undefined</style>
+    <main role="main">
+    <article class="row article post" role="article">
+      <div class="cell">
+        <header class="row">
+          <div class="home">
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
+          </div>
+        </header>
+          <h1 class="preview-title">Pronouncing "Gadsby"</h1> 
+<div class="preview-info">
+
+<div><i>October  7, 2012</i></div>
+</div>
+<p>
+
+</p><p>I was reading about a lipogrammatic novel called <em>Gadsby: A Story of Over 50,000 Words Without Using the Letter “E”</em>, by Ernest Vincent Wright, when I wondered how the lack of an overt letter “E” affected the pronunciation of the work.</p>
+<p>A bit of Googling<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> led me to <a href="http://www.nltk.org/">NLTK</a>, a natural-language toolkit for Python. I typed:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> nltk</code></pre></div>
+<p>and the hard part was already done for me.</p>
+<!--more-->
+<p>Soon I had a hacky script:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> nltk
+<span class="im">import</span> re
+
+pronDict <span class="op">=</span> nltk.corpus.cmudict.<span class="bu">dict</span>()
+
+<span class="kw">def</span> flatten(<span class="bu">list</span>):
+    <span class="cf">return</span> [x <span class="cf">for</span> xs <span class="op">in</span> <span class="bu">list</span> <span class="cf">for</span> x <span class="op">in</span> xs]
+
+<span class="kw">def</span> normalizePhoneme(phoneme):
+    <span class="cf">return</span> re.sub(<span class="st">"\d+"</span>, <span class="st">""</span>, phoneme)
+
+<span class="kw">def</span> wordMatchesPhonemes(phonemes, word):
+    <span class="cf">if</span> <span class="op">not</span> word <span class="op">in</span> pronDict: <span class="cf">return</span> <span class="va">False</span>
+    prons <span class="op">=</span> pronDict[word]
+    <span class="co"># Flatten pronounciations into a set of normalized phonemes.</span>
+    wordPhonemes <span class="op">=</span> <span class="bu">map</span>(normalizePhoneme, <span class="bu">set</span>(flatten(prons)))
+    <span class="cf">return</span> <span class="bu">any</span>([wp <span class="op">in</span> phonemes <span class="cf">for</span> wp <span class="op">in</span> wordPhonemes])
+
+<span class="kw">def</span> wordsMatchingPhonemes(text, phonemes):
+    words <span class="op">=</span> <span class="bu">set</span>(re.sub(<span class="st">"[^\w| ]"</span>, <span class="st">""</span>, text.lower()).split())
+    <span class="cf">return</span> <span class="bu">filter</span>(<span class="kw">lambda</span> word: wordMatchesPhonemes(phonemes, word), words)</code></pre></div>
+<p>When passed a text and a list of phonemes, the <code>wordsMatchingPhonemes</code> function returns a list of the words that contain at least one of these phonemes.</p>
+<p>Moby Dick, a text where the author made no special effort to avoid the letter “E”, contains at least one “E” sound in 59% of its words<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>When we analyse Gadsby, a text that contains no words with the letter “E”, we find that only 42% of its words contained at least one “E” sound. It is still a large proportion, however, demonstrating (despite Wright’s Herculean efforts) the cardinality of the “E” sound to the English language.</p>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>There are some questions you’ll never know the answer to. But nowadays we have Google, and the set of these unanswerable questions are a great deal smaller.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>The phonemes EM, ER, EH, EY, IY, and EM were used to discover words containing “E” sounds.<a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
+
+
+
+
+        <div id="footer">
+          <small>Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+        </div>
+      </div>
+    </article>
+    </main>
+  
+
+</body></html>

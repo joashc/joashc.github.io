@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
+    <script src="https://use.typekit.net/geg0pqq.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Why is SelectMany so weird?</title>
+    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-adobe-garamond-pro{font-family:"adobe-garamond-pro",sans-serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/ee6a48/1w;adobe-garamond-pro,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,Xs1:W:i4,Xs2:W:n4,Xrz:W:n7/k?3bb2a6e53c9684ffdc9a9aff1d5b2a62de246c40fc2071e052ac61ed39dbb7bdfa68192f9a86ce4374a9c8e19c7f4d236834b42ff893f3cac65f10f7e33d50f2b872d0a4d446880f7ffa35227c30507ea59d6633b8866c87443c456db90fc8e1a8" media="all">
+  </head>
+
+  <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
+.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
+.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
+.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
+.mjx-math * {display: inline-block; text-align: left}
+.mjx-numerator {display: block; text-align: center}
+.mjx-denominator {display: block; text-align: center}
+.MJXc-stacked {height: 0; position: relative}
+.MJXc-stacked > * {position: absolute}
+.MJXc-bevelled > * {display: inline-block}
+.mjx-stack {display: inline-block}
+.mjx-op {display: block}
+.mjx-under {display: table-cell}
+.mjx-over {display: block}
+.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-stack > .mjx-sup {display: block}
+.mjx-stack > .mjx-sub {display: block}
+.mjx-prestack > .mjx-presup {display: block}
+.mjx-prestack > .mjx-presub {display: block}
+.mjx-delim-h > .mjx-char {display: inline-block}
+.mjx-surd {vertical-align: top}
+.mjx-mphantom * {visibility: hidden}
+.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
+.mjx-annotation-xml {line-height: normal}
+.mjx-menclose > svg {fill: none; stroke: currentColor}
+.mjx-mtr {display: table-row}
+.mjx-mlabeledtr {display: table-row}
+.mjx-mtd {display: table-cell; text-align: center}
+.mjx-label {display: block}
+.mjx-box {display: inline-block}
+.mjx-block {display: block}
+.mjx-span {display: span}
+.mjx-char {display: block; white-space: pre}
+.mjx-itable {display: inline-table}
+.mjx-row {display: table-row}
+.mjx-cell {display: table-cell}
+.mjx-table {display: table; width: 100%}
+.mjx-line {display: block; height: 0}
+.mjx-strut {width: 0; padding-top: 1em}
+.mjx-vsize {width: 0}
+.MJXc-space1 {margin-left: .167em}
+.MJXc-space2 {margin-left: .222em}
+.MJXc-space3 {margin-left: .278em}
+.mjx-ex-box-test {position: absolute; width: 1px; height: 60ex}
+.MJXc-TeX-unknown-R {font-family: monospace; font-style: normal; font-weight: normal}
+.MJXc-TeX-unknown-I {font-family: monospace; font-style: italic; font-weight: normal}
+.MJXc-TeX-unknown-B {font-family: monospace; font-style: normal; font-weight: bold}
+.MJXc-TeX-unknown-BI {font-family: monospace; font-style: italic; font-weight: bold}
+.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
+.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
+.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
+.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
+.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
+.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
+.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
+.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
+.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
+.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
+.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
+.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
+.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
+.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
+.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
+.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
+.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
+.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
+.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
+@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
+@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
+@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
+@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
+@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
+@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
+@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
+@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
+@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
+@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
+@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
+@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
+@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
+@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
+@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
+@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
+@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
+@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
+@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
+@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
+@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
+@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
+@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
+@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
+</style>
+    <main role="main">
+    <article class="row article post" role="article">
+      <div class="cell">
+        <header class="row">
+          <div class="home">
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
+          </div>
+        </header>
+          <h1 class="preview-title">Why is SelectMany so weird?</h1> 
+<div class="preview-info">
+
+  Part III of the series <i>Fun with Functional C#</i>.
+
+<div><i>March 17, 2016</i></div>
+</div>
+<p>
+
+</p><p>This episode, we’ll be looking at why <code>SelectMany</code> will look so strange to Haskell users, why that’s linked to some implementation-level issues with C#, and the extremely cool way that the C# team got around those issues.</p>
+<p>A quick recap: LINQ query syntax is actually just Haskell do-notation, specialized for the list monad.</p>
+<p>We can see this by looking at the signature for <code>SelectMany</code>:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;B&gt; SelectMany&lt;A, B&gt;(
+  <span class="kw">this</span> IEnumerable&lt;A&gt; source,
+  Func&lt;A, IEnumerable&lt;B&gt;&gt; selector
+)</code></pre></div>
+<p>It’s a less polymorphic Haskell bind:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">bind ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</code></pre></div>
+<p>When I first saw this, I immediately attempted to write my own monad instance in C#, and had a Bad Time. But figuring out why it wasn’t so easy was probably more interesting than writing the monad instances in the first place!</p>
+<!--more-->
+<h2 id="desugaring">Desugaring</h2>
+<p>With do-notation, if you write</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">permutations ::</span> [(<span class="dt">Int</span>, <span class="dt">Char</span>)]
+permutations <span class="fu">=</span> <span class="kw">do</span>
+  number <span class="ot">&lt;-</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]
+  letter <span class="ot">&lt;-</span> [<span class="ch">'a'</span>,<span class="ch">'b'</span>,<span class="ch">'c'</span>]
+  return (number, letter)</code></pre></div>
+<p>it will be desugared into</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">permutations <span class="fu">=</span>
+  [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="fu">&gt;&gt;=</span> \number <span class="ot">-&gt;</span>
+    [<span class="ch">'a'</span>,<span class="ch">'b'</span>,<span class="ch">'c'</span>] <span class="fu">&gt;&gt;=</span> \letter <span class="ot">-&gt;</span>
+      return (number, letter)</code></pre></div>
+<p>Because of the nested lambdas, the final <code>return</code> has all the bound variables<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> in scope, which is why do-notation has such an imperative flavor.</p>
+<p>Here’s the same thing in C#:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from number in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+from letter in <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'}
+select $<span class="st">"({number}, {letter})"</span>;</code></pre></div>
+<p>If you’re used to Haskell do-notation, you’d expect this to desugar nicely into:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}.<span class="fu">SelectMany</span>(number =&gt;
+  <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'}.<span class="fu">Select</span>(letter =&gt; 
+    $<span class="st">"({number}, {letter})"</span>
+  )
+);</code></pre></div>
+<p>But if you just try to run this code, and you’ve only implemented the <code>SelectMany</code> overload that corresponds with Haskell bind<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, you’ll get an error saying: <code>No overload for 'SelectMany' takes '3' arguments</code>.</p>
+<p>This is a clue that the C# compiler is desugaring this into a call to a mysterious version of <code>SelectMany</code> that takes three arguments:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;C&gt; SelectMany&lt;A,B,C&gt;(
+  <span class="kw">this</span> IEnumerable&lt;A&gt; source,
+  Func&lt;A, IEnumberable&lt;B&gt;&gt; f,
+  Func&lt;A, B, C&gt; projection
+)</code></pre></div>
+<h2 id="three-arguments">Three arguments?</h2>
+<p>It turns out that no one wanted to write <code>SelectMany</code> like this; it was forced on the C# team because of an optimization issue with nested lambdas and method overloads<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. Let’s take a look at an example.</p>
+<p>Here are the signatures of three overloaded methods:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">string <span class="fu">A</span>(Func&lt;string, string&gt; f);
+DateTime <span class="fu">A</span>(Func&lt;DateTime, DateTime&gt; f);
+string <span class="fu">A</span>(Func&lt;DateTime, string&gt; f);</code></pre></div>
+<p>If we write:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; x.<span class="fu">AddMinutes</span>(<span class="dv">5</span>));</code></pre></div>
+<p>It’s pretty obvious that the type of <code>x</code> in the lambda should resolve to <code>DateTime</code>. But the compiler needs to check <em>all</em> the other overloads, even if it’s already found one that typechecks, or it can’t know that it’s found a <em>unique</em> overload. Consider what happens if we write:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; x.<span class="fu">ToString</span>());</code></pre></div>
+<p>You’d expect the compiler to complain that the type of the lambda is ambiguous; it could be a <code>Func&lt;string, string&gt;</code> or a <code>Func&lt;DateTime, string&gt;</code>. So if we have <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-2549" class="mjx-math" role="math"><span id="MJXc-Node-2550" class="mjx-mrow"><span id="MJXc-Node-2551" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads, we need to check all <span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-2552" class="mjx-math" role="math"><span id="MJXc-Node-2553" class="mjx-mrow"><span id="MJXc-Node-2554" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> of them.</p>
+<p>Unfortunately for the compiler, we can also write a nested lambda:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; <span class="fu">A</span>(y =&gt; x.<span class="fu">AddMinutes</span>(<span class="dv">3</span>).<span class="fu">ToString</span>() + y.<span class="fu">ToString</span>()));</code></pre></div>
+<p>Now, for each possible type of <code>x</code>, the compiler needs to check all possible types of <code>y</code>, to make sure there’s a single, unambiguous overload resolution for this line of code. At this rate, we’re going to need to check <span id="MathJax-Element-3-Frame" class="mjx-chtml"><span id="MJXc-Node-2555" class="mjx-math" role="math"><span id="MJXc-Node-2556" class="mjx-mrow"><span id="MJXc-Node-2557" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2558" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2559" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> possibilities, for <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-2560" class="mjx-math" role="math"><span id="MJXc-Node-2561" class="mjx-mrow"><span id="MJXc-Node-2562" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads and <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-2563" class="mjx-math" role="math"><span id="MJXc-Node-2564" class="mjx-mrow"><span id="MJXc-Node-2565" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span> levels of nesting<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. If you had a method with ten overloads and nested it seven deep, the compiler would need to check ten million overloads, which would probably make Intellisense a little sluggish.</p>
+<h2 id="the-optimization">The optimization</h2>
+<p>If you try to use multiple <code>from</code> statements in a LINQ query expression, it won’t be desugared into a nested <code>SelectMany</code>, like you’d expect. Instead, the compiler will try to use that weird version of <code>SelectMany</code>, avoiding the nesting and its <span id="MathJax-Element-6-Frame" class="mjx-chtml"><span id="MJXc-Node-2566" class="mjx-math" role="math"><span id="MJXc-Node-2567" class="mjx-mrow"><span id="MJXc-Node-2568" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2569" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2570" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> behaviour:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;C&gt; SelectMany&lt;A,B,C&gt;(
+  <span class="kw">this</span> IEnumerable&lt;A&gt; source,
+  Func&lt;A, IEnumberable&lt;B&gt;&gt; f,
+  Func&lt;A, B, C&gt; projection
+)</code></pre></div>
+<p>So when you write:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from number in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+from letter in <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'}
+select $<span class="st">"({number}, {letter})"</span>;</code></pre></div>
+<p>The final <code>select</code> statement of the query is desugared into a lambda:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">(number, letter) =&gt; $<span class="st">"({number}, {letter})"</span></code></pre></div>
+<p>This lambda has a type of <code>Func&lt;int, char, string&gt;</code>, which allows it to slot into the <code>Func&lt;A,B,C&gt;</code> parameter of <code>SelectMany</code>. Desugaring the rest of the query expression gives us some plain C#:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}.<span class="fu">SelectMany</span>(
+  number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+  (number, letter) =&gt; $<span class="st">"({number}, {letter})"</span>
+);</code></pre></div>
+<p>Now we don’t need nested lambdas to have both <code>number</code> and <code>letter</code> in scope!</p>
+<h2 id="more-where-that-came-from">More where that came <code>from</code></h2>
+<p>If you’re paying attention, you’ll have noticed something fishy- the signature for <code>SelectMany</code> only seems sensible if you only have two <code>from</code> statements. The final parameter to the three-argument overload of <code>SelectMany</code> has a type of <code>Func&lt;A,B,C&gt;</code>, which works fine if you only need to pass two variables to the final <code>select</code>. But if you have three <code>from</code> statements<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>, it doesn’t seem like you can have all three variables in scope for the final projection, because a <code>Func&lt;A,B,C&gt;</code> only has two parameters.</p>
+<p>For instance, we should be able to bind three variables in a query expression like this:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from number in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+from letter in <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'}
+from item in itemList
+select $<span class="st">"({number}, {letter}, {item.Name})"</span>;</code></pre></div>
+<p>There’s three variables we need in scope for the final <code>select</code>, but it’s supposed to desugar into a <code>Func&lt;A,B,C&gt;</code>, which only has room for two variables! It seems like this version of <code>SelectMany</code> only manages to avoid one level of nesting; add another <code>from</code> statement and we’re back to square one.</p>
+<p>But the C# compiler has another trick up its sleeve, <em>transparent identifiers</em>, that was introduced to solve this very issue.</p>
+<p>When the compiler encounters two <code>from</code>s followed by anything that’s not a <code>select</code>, it rewrites them like we did earlier, and binds the result to a transparent identifier, represented by a <code>*</code>. The result is this intermediate query:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from * in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}.<span class="fu">SelectMany</span>(
+            number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+            (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+          )
+from item in itemList
+select $<span class="st">"({number}, {letter}, {item.Name})"</span>;</code></pre></div>
+<p>Now we’re back at the two <code>from</code>s case, and we can rewrite again:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+  .<span class="fu">SelectMany</span>(
+      number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+      (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+  )
+  .<span class="fu">SelectMany</span>(
+      * =&gt; itemList,
+      (*, item) =&gt; $<span class="st">"({number}, {letter}, {item.Name})"</span>
+  );</code></pre></div>
+<p>We’ve desugared this query without any nasty nesting! But what is that <code>*</code>?</p>
+<h2 id="the-of-the-show">The * of the show</h2>
+<p>Depending on your sensibilities, you can look at transparent identifiers as a nasty hack or a brilliant workaround<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>. Basically, they allow chained method calls to emulate the scoping behaviour of nested lambdas.</p>
+<p>Let’s zoom in:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from * in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}.<span class="fu">SelectMany</span>(
+            number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+            (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+          )</code></pre></div>
+<p>The <code>*</code> represents a transparent identifier, which has an anonymous type:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">* = <span class="kw">new</span> { number, letter }</code></pre></div>
+<p>Because we can’t use nesting, we can’t rely on lexical closure to get the <code>number</code> and <code>letter</code> variables in scope for the next <code>from</code>. So the compiler creates a transparent identifier with an anonymous type <code>{number, letter}</code>, effectively bundling the two types into one product type. And now we can call <code>SelectMany</code> on this anonymous type, and look inside it for our two variables.</p>
+<p>Let’s desugar it further.</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+  .<span class="fu">SelectMany</span>(
+      number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+      (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+  )
+  .<span class="fu">SelectMany</span>(
+      transId =&gt; itemList,
+      (transId, item) =&gt; $<span class="st">"({transId.number}, {transId.letter}, {item.Name})"</span>
+  );</code></pre></div>
+<p>That actually looks pretty normal! The <code>transId</code> variable contains our two previously bound variables, which, if you’re keeping score, means we’ve managed to squeeze three variables into a function scope that only has two parameters, <em>without</em> using closures.</p>
+<p>That’s not all, though. This idea generalizes to arbitrary numbers of <code>from</code> or <code>let</code> statements, by giving transparent identifiers transitive scoping. Let’s see how that works. This expression:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">from number in <span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+from letter in <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'}
+from item in itemList
+from widget in widgetList
+select $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>;</code></pre></div>
+<p>will desugar into an expression with multiple transparent identifiers:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+  .<span class="fu">SelectMany</span>(
+      number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+      (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+  )
+  .<span class="fu">SelectMany</span>(
+      *<span class="dv">1</span> =&gt; itemList,
+      (*<span class="dv">1</span>, item) =&gt; { *<span class="dv">1</span>, item }
+  )
+  .<span class="fu">SelectMany</span>(
+      *<span class="dv">2</span> =&gt; widget,
+      (*<span class="dv">2</span>, widget) =&gt; $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>
+  );</code></pre></div>
+<p>The transitivity of transparent identifier scope is achieved by nesting transparent identifiers:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">*<span class="dv">1</span> = { number, letter }
+*<span class="dv">2</span> = { *<span class="dv">1</span>, item }</code></pre></div>
+<p>It’s interesting that we’ve exchanged one kind of nesting for another! Now we can resolve the nested transparent identifiers:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
+  .<span class="fu">SelectMany</span>(
+      number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+      (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+  )
+  .<span class="fu">SelectMany</span>(
+      ti1 =&gt; itemList,
+      (ti1, item) =&gt; { ti1, item }
+  )
+  .<span class="fu">SelectMany</span>(
+      ti2 =&gt; widget,
+      (ti2, widget) =&gt;
+        $<span class="st">"({ti2.ti1.number}, {ti2.ti1.letter}, {ti2.item.Name}, {widget.Id})"</span>
+  );</code></pre></div>
+<p>And we’ve got vanilla C# chained method calls emulating closures!</p>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>In this case, <code>number</code> and <code>letter</code>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>You wouldn’t actually see this error for <code>IEnumerable</code>, since it’s implemented by default. But you’ll see the error if you implement your own monad instances.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Haskell can desugar directly into nested <code>bind</code> calls because it doesn’t support method overloading.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Amusingly, Eric Lippert, from whom I shamelessly <a href="http://ericlippert.com/2013/04/02/monads-part-twelve/">stole</a> this section of the post, managed to <a href="https://blogs.msdn.microsoft.com/ericlippert/2007/03/28/lambda-expressions-vs-anonymous-methods-part-five/">encode 3SAT into the overload resolution of nested lambdas</a>, proving that this problem is at least NP-hard!<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Or any query expression that binds more than two variables; you could have two <code>from</code>s and a <code>let</code>, for instance.<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>Or both.<a href="#fnref6">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
+
+
+
+
+        <div id="footer">
+          <small>Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+        </div>
+      </div>
+    </article>
+    </main>
+  
+
+</body></html>
