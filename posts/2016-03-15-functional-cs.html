@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
-    <script src="https://use.typekit.net/geg0pqq.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+       <script src="https://use.typekit.net/geg0pqq.js"></script><script>
+        (function(d) {
+          var config = {
+            kitId: 'geg0pqq',
+            scriptTimeout: 3000,
+            async: true
+          },
+          h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+        })(document);
+    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Functional C#</title>
-    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-adobe-garamond-pro{font-family:"adobe-garamond-pro",sans-serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/ee6a48/1w;adobe-garamond-pro,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,Xs1:W:i4,Xs2:W:n4,Xrz:W:n7/k?3bb2a6e53c9684ffdc9a9aff1d5b2a62de246c40fc2071e052ac61ed39dbb7bdfa68192f9a86ce4374a9c8e19c7f4d236834b42ff893f3cac65f10f7e33d50f2b872d0a4d446880f7ffa35227c30507ea59d6633b8866c87443c456db90fc8e1a8" media="all">
+    <!--
+     <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                displayAlign: "left",
+                showProcessingMessages: false,
+                showMathMenu: true,
+                messageStyle: "none",
+                TeX: { TagSide: "left", equationNumbers: { autoNumber: "AMS" } }
+            });
+        </script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+        </script>
+        -->
+   <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
   </head>
 
   <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
@@ -164,23 +185,33 @@
 <p>I thought that writing Haskellish code in C# wasn’t actually that bad, but because I was essentially thinking in Haskell and then “translating” into C#, there were a lot of times something that was simple in Haskell required a great deal of ceremony and awkwardness<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
 <p>My biggest sticking points with functional C# mainly revolved around the type system.</p>
 <h4 id="type-syntax">Type syntax</h4>
-<p>C#’s type syntax is rather cumbersome, making writing and reading type signatures a rather unpleasant experience. Much of what makes Haskell enjoyable is encoding as much information as possible into the types and letting the compiler do as much work for you as possible. C# actively works against you in this regard. It’s amazing how opaque fairly basic type signatures look:</p>
-<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;B&gt; SelectMany&lt;A, B&gt;(<span class="kw">this</span> IEnumerable&lt;A&gt; source, Func&lt;A, IEnumerable&lt;B&gt;&gt; selector)</code></pre></div>
+<p>C#’s type syntax is rather cumbersome, making writing and reading type signatures a rather unpleasant experience. Much of what makes Haskell enjoyable is encoding as much information as possible into the types and letting the compiler do as much work for you as possible. C# actively works against you in this regard. Fairly basic type signatures look pretty opaque:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">IEnumerable&lt;B&gt; SelectMany&lt;A, B&gt;(
+  <span class="kw">this</span> IEnumerable&lt;A&gt; source, 
+  Func&lt;A, IEnumerable&lt;B&gt;&gt; selector
+)</code></pre></div>
 <p>compared with their Haskell equivalent:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">selectMany ::</span> <span class="dt">Foldable</span> t <span class="ot">=&gt;</span> t a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> t b) <span class="ot">-&gt;</span> t b</code></pre></div>
 <p>I was always mentally translating C# signatures into their Haskell equivalent, which have a shape and “glancability” that the C# signatures lack. Functional programming involves a lot of gluing functions together, something that’s hindered when you’re mentally transposing the return type of the function to the other end.</p>
 <h4 id="weak-type-inference">Weak type inference</h4>
 <p>Compounding the issue is the weak type inference, forcing you to repeatedly write out type annotations:</p>
-<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="dt">static</span> Either&lt;IConfigError, RoutingDefinition&gt; <span class="fu">CheckDuplicateTransports</span>(RoutingDefinition def)
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="dt">static</span> Either&lt;IConfigError, RoutingDefinition&gt; 
+<span class="fu">CheckDuplicateTransports</span>(RoutingDefinition def)
 {
   var hasDuplicates = <span class="fu">CheckDuplicates</span>(def);
-  <span class="kw">if</span> (hasDuplicates) <span class="kw">return</span> Left&lt;IConfigError, RoutingDefinition&gt;(DuplicateTransports.<span class="fu">Error</span>);
+  <span class="kw">if</span> (hasDuplicates) {
+    <span class="kw">return</span> Left&lt;IConfigError, RoutingDefinition&gt;
+    (DuplicateTransports.<span class="fu">Error</span>);
+  }
   <span class="kw">else</span> <span class="kw">return</span> Right&lt;IConfigError, RoutingDefinition&gt;(def)
 }</code></pre></div>
 <p>instead of just <code>Left(DuplicateTransports.Error)</code>. You can sort of hack around this by dumping a bunch of monomorphic functions into a static class:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="dt">static</span> <span class="kw">class</span> EitherFunctions
 {
-  <span class="kw">public</span> <span class="dt">static</span> Func&lt;RoutingDefintion, Either&lt;IConfigError, RoutingDefinition&gt;&gt;
+  <span class="kw">public</span> <span class="dt">static</span> Func&lt;
+    RoutingDefintion,
+    Either&lt;IConfigError, RoutingDefinition&gt;
+  &gt;
   RightDef = Right&lt;IConfigError, RoutingDefinition&gt;
 
   <span class="kw">public</span> <span class="dt">static</span> Func&lt;IConfigError, Either&lt;IConfigError, RoutingDefinition&gt;&gt;

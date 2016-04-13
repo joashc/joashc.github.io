@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
-    <script src="https://use.typekit.net/geg0pqq.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+       <script src="https://use.typekit.net/geg0pqq.js"></script><script>
+        (function(d) {
+          var config = {
+            kitId: 'geg0pqq',
+            scriptTimeout: 3000,
+            async: true
+          },
+          h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+        })(document);
+    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Why is SelectMany so weird?</title>
-    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-adobe-garamond-pro{font-family:"adobe-garamond-pro",sans-serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/ee6a48/1w;adobe-garamond-pro,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,Xs1:W:i4,Xs2:W:n4,Xrz:W:n7/k?3bb2a6e53c9684ffdc9a9aff1d5b2a62de246c40fc2071e052ac61ed39dbb7bdfa68192f9a86ce4374a9c8e19c7f4d236834b42ff893f3cac65f10f7e33d50f2b872d0a4d446880f7ffa35227c30507ea59d6633b8866c87443c456db90fc8e1a8" media="only x">
+    <!--
+     <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                displayAlign: "left",
+                showProcessingMessages: false,
+                showMathMenu: true,
+                messageStyle: "none",
+                TeX: { TagSide: "left", equationNumbers: { autoNumber: "AMS" } }
+            });
+        </script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+        </script>
+        -->
+   <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
   </head>
 
   <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
@@ -193,12 +214,12 @@ string <span class="fu">A</span>(Func&lt;DateTime, string&gt; f);</code></pre></
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; x.<span class="fu">AddMinutes</span>(<span class="dv">5</span>));</code></pre></div>
 <p>It’s pretty obvious that the type of <code>x</code> in the lambda should resolve to <code>DateTime</code>. But the compiler needs to check <em>all</em> the other overloads, even if it’s already found one that typechecks, or it can’t know that it’s found a <em>unique</em> overload. Consider what happens if we write:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; x.<span class="fu">ToString</span>());</code></pre></div>
-<p>You’d expect the compiler to complain that the type of the lambda is ambiguous; it could be a <code>Func&lt;string, string&gt;</code> or a <code>Func&lt;DateTime, string&gt;</code>. So if we have <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-2549" class="mjx-math" role="math"><span id="MJXc-Node-2550" class="mjx-mrow"><span id="MJXc-Node-2551" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads, we need to check all <span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-2552" class="mjx-math" role="math"><span id="MJXc-Node-2553" class="mjx-mrow"><span id="MJXc-Node-2554" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> of them.</p>
+<p>You’d expect the compiler to complain that the type of the lambda is ambiguous; it could be a <code>Func&lt;string, string&gt;</code> or a <code>Func&lt;DateTime, string&gt;</code>. So if we have <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-2543" class="mjx-math" role="math"><span id="MJXc-Node-2544" class="mjx-mrow"><span id="MJXc-Node-2545" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads, we need to check all <span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-2546" class="mjx-math" role="math"><span id="MJXc-Node-2547" class="mjx-mrow"><span id="MJXc-Node-2548" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> of them.</p>
 <p>Unfortunately for the compiler, we can also write a nested lambda:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="fu">A</span>(x =&gt; <span class="fu">A</span>(y =&gt; x.<span class="fu">AddMinutes</span>(<span class="dv">3</span>).<span class="fu">ToString</span>() + y.<span class="fu">ToString</span>()));</code></pre></div>
-<p>Now, for each possible type of <code>x</code>, the compiler needs to check all possible types of <code>y</code>, to make sure there’s a single, unambiguous overload resolution for this line of code. At this rate, we’re going to need to check <span id="MathJax-Element-3-Frame" class="mjx-chtml"><span id="MJXc-Node-2555" class="mjx-math" role="math"><span id="MJXc-Node-2556" class="mjx-mrow"><span id="MJXc-Node-2557" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2558" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2559" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> possibilities, for <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-2560" class="mjx-math" role="math"><span id="MJXc-Node-2561" class="mjx-mrow"><span id="MJXc-Node-2562" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads and <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-2563" class="mjx-math" role="math"><span id="MJXc-Node-2564" class="mjx-mrow"><span id="MJXc-Node-2565" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span> levels of nesting<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. If you had a method with ten overloads and nested it seven deep, the compiler would need to check ten million overloads, which would probably make Intellisense a little sluggish.</p>
+<p>Now, for each possible type of <code>x</code>, the compiler needs to check all possible types of <code>y</code>, to make sure there’s a single, unambiguous overload resolution for this line of code. At this rate, we’re going to need to check <span id="MathJax-Element-3-Frame" class="mjx-chtml"><span id="MJXc-Node-2549" class="mjx-math" role="math"><span id="MJXc-Node-2550" class="mjx-mrow"><span id="MJXc-Node-2551" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2552" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2553" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> possibilities, for <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-2554" class="mjx-math" role="math"><span id="MJXc-Node-2555" class="mjx-mrow"><span id="MJXc-Node-2556" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span> overloads and <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-2557" class="mjx-math" role="math"><span id="MJXc-Node-2558" class="mjx-mrow"><span id="MJXc-Node-2559" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span> levels of nesting<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. If you had a method with ten overloads and nested it seven deep, the compiler would need to check ten million overloads, which would probably make Intellisense a little sluggish.</p>
 <h2 id="the-optimization">The optimization</h2>
-<p>If you try to use multiple <code>from</code> statements in a LINQ query expression, it won’t be desugared into a nested <code>SelectMany</code>, like you’d expect. Instead, the compiler will try to use that weird version of <code>SelectMany</code>, avoiding the nesting and its <span id="MathJax-Element-6-Frame" class="mjx-chtml"><span id="MJXc-Node-2566" class="mjx-math" role="math"><span id="MJXc-Node-2567" class="mjx-mrow"><span id="MJXc-Node-2568" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2569" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2570" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> behaviour:</p>
+<p>If you try to use multiple <code>from</code> statements in a LINQ query expression, it won’t be desugared into a nested <code>SelectMany</code>, like you’d expect. Instead, the compiler will try to use that weird version of <code>SelectMany</code>, avoiding the nesting and its <span id="MathJax-Element-6-Frame" class="mjx-chtml"><span id="MJXc-Node-2560" class="mjx-math" role="math"><span id="MJXc-Node-2561" class="mjx-mrow"><span id="MJXc-Node-2562" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-2563" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-2564" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span></span></span> behaviour:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;C&gt; SelectMany&lt;A,B,C&gt;(
   <span class="kw">this</span> IEnumerable&lt;A&gt; source,
   Func&lt;A, IEnumberable&lt;B&gt;&gt; f,
@@ -261,7 +282,8 @@ select $<span class="st">"({number}, {letter}, {item.Name})"</span>;</code></pre
   )
   .<span class="fu">SelectMany</span>(
       transId =&gt; itemList,
-      (transId, item) =&gt; $<span class="st">"({transId.number}, {transId.letter}, {item.Name})"</span>
+      (transId, item) =&gt; 
+        $<span class="st">"({transId.number}, {transId.letter}, {item.Name})"</span>
   );</code></pre></div>
 <p>That actually looks pretty normal! The <code>transId</code> variable contains our two previously bound variables, which, if you’re keeping score, means we’ve managed to squeeze three variables into a function scope that only has two parameters, <em>without</em> using closures.</p>
 <p>That’s not all, though. This idea generalizes to arbitrary numbers of <code>from</code> or <code>let</code> statements, by giving transparent identifiers transitive scoping. Let’s see how that works. This expression:</p>
@@ -282,7 +304,8 @@ select $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>
   )
   .<span class="fu">SelectMany</span>(
       *<span class="dv">2</span> =&gt; widget,
-      (*<span class="dv">2</span>, widget) =&gt; $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>
+      (*<span class="dv">2</span>, widget) =&gt; 
+        $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>
   );</code></pre></div>
 <p>The transitivity of transparent identifier scope is achieved by nesting transparent identifiers:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">*<span class="dv">1</span> = { number, letter }
@@ -290,17 +313,18 @@ select $<span class="st">"({number}, {letter}, {item.Name}, {widget.Id})"</span>
 <p>It’s interesting that we’ve exchanged one kind of nesting for another! Now we can resolve the nested transparent identifiers:</p>
 <div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> List&lt;<span class="dt">int</span>&gt;{<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}
   .<span class="fu">SelectMany</span>(
-      number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
-      (number, letter) =&gt; <span class="kw">new</span> { number, letter }
+    number =&gt; <span class="kw">new</span> List&lt;<span class="dt">char</span>&gt;{'a','b','c'},
+    (number, letter) =&gt; <span class="kw">new</span> { number, letter }
   )
   .<span class="fu">SelectMany</span>(
-      ti1 =&gt; itemList,
-      (ti1, item) =&gt; { ti1, item }
+    ti1 =&gt; itemList,
+    (ti1, item) =&gt; { ti1, item }
   )
   .<span class="fu">SelectMany</span>(
-      ti2 =&gt; widget,
-      (ti2, widget) =&gt;
-        $<span class="st">"({ti2.ti1.number}, {ti2.ti1.letter}, {ti2.item.Name}, {widget.Id})"</span>
+    ti2 =&gt; widget,
+    (ti2, widget) =&gt;
+      $<span class="st">"({ti2.ti1.number}, {ti2.ti1.letter},\</span>
+<span class="st">      {ti2.item.Name}, {widget.Id})"</span>
   );</code></pre></div>
 <p>And we’ve got vanilla C# chained method calls emulating closures!</p>
 <div class="footnotes">
