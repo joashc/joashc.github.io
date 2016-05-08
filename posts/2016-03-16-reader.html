@@ -276,12 +276,15 @@
 <h2 id="so-its-useless">So it’s useless?</h2>
 <p>No, I don’t think it’s <em>useless</em>. Programs exist along a spectrum of purity, and all things being equal, I’d rather live in a codebase on the purer end, even if every single function wasn’t pure.</p>
 <p>But purity is only one side of the story. The reader monad is basically a convenient<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> way to thread a read-only state through a bunch of functions. This means you don’t need to rely on the class object graph for dependencies, which can be useful because changing the object graph is frequently a real pain.</p>
-<p>But if you’re using both DI and the reader monad, you’ve got two ways of accomplishing the same thing, and it’s not clear where to draw the line.</p>
+<p>But the reader monad is only convenient in languages where there’s adequate type inference and syntax. If you’re using a language like C#, there are times where you’ll have to deal with the cumbersome type <code>Reader&lt;Env, A&gt;</code>, even with hacks like <a href="https://github.com/louthy/language-ext">language-ext</a>. So the reader monad turns out not to be all that convenient in C#, nor does it provide the type-level safety that it does in purer languages.</p>
+<p>Interestingly, Scala has slightly better type inference than C#, but still doesn’t have the purity of Haskell. In Scala, the reader monad is seen as a viable alternative (or a supplement to) more traditional approaches to DI, like the cake pattern. In C#, it seems that we only need to push the convenience side a little bit<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> for the reader monad to become useful, or encounter a situation where <em>not</em> using the reader monad is more inconvenient than using it. I’ve actually encountered <em>one</em> situation where that’s the case, but that will have to be the subject of another post.</p>
+<p>In general, however, I think idiomatic approaches to DI in C# strike the best balance between ease of use, utility, and expressiveness.</p>
 <div class="footnotes">
 <hr>
 <ol>
 <li id="fn1"><p>Being able to move a function out of the class without anything breaking is a reasonable proxy for the purity of the function.<a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>“Convenience” often means that we eliminate the need for a repetitive, error-prone activity (like threading state through functions), which means something that can look like a mere “convenience” can actually result in higher code quality.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Perhaps with better type inference, or some language-ext-style trickery.<a href="#fnref3">↩</a></p></li>
 </ol>
 </div>
 

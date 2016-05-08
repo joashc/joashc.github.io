@@ -187,7 +187,7 @@ pronDict <span class="op">=</span> nltk.corpus.cmudict.<span class="bu">dict</sp
 
 <span class="kw">def</span> wordsMatchingPhonemes(text, phonemes):
     words <span class="op">=</span> <span class="bu">set</span>(re.sub(<span class="st">"[^\w| ]"</span>, <span class="st">""</span>, text.lower()).split())
-    <span class="cf">return</span> <span class="bu">filter</span>(<span class="kw">lambda</span> word: wordMatchesPhonemes(phonemes, word), words)</code></pre></div>
+    <span class="cf">return</span> [word <span class="cf">for</span> word <span class="op">in</span> words <span class="cf">if</span> wordMatchesPhonemes(phonemes, word)]</code></pre></div>
 <p>When passed a text and a list of phonemes, the <code>wordsMatchingPhonemes</code> function returns a list of the words that contain at least one of these phonemes.</p>
 <p>Moby Dick, a text where the author made no special effort to avoid the letter “E”, contains at least one “E” sound in 59% of its words<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
 <p>When we analyse Gadsby, a text that contains no words with the letter “E”, we find that only 42% of its words contained at least one “E” sound. It is still a large proportion, however, demonstrating (despite Wright’s Herculean efforts) the cardinality of the “E” sound to the English language.</p>

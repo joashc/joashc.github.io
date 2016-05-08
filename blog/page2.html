@@ -157,6 +157,34 @@
           <br>
 
   <h1 class="preview-title">
+    <a href="../posts/2016-03-15-functional-cs.html" style="background-image: none">Functional C#</a>
+  </h1> 
+  <div class="preview-info">
+  
+    Part I of the series <i>Fun with Functional C#</i>.
+  
+  <div><i>March 15, 2016</i></div>
+  </div>
+  <p>
+  </p><p>
+  
+  </p><div class="preview">
+     <p>With the introduction of LINQ in C#3, Erik Meijer and co. rebranded monads and presented them to a huge audience, and I think the way they did it was a brilliant piece of programming language UX design.</p>
+<p>Apparently, before Erik Meijer joined the team working on LINQ, their goal was just to reduce the impedance mismatch between SQL databases and C#. So the solution they came up with was to let developers query SQL databases by writing SQL queries directly within C#- basically a language-level ORM.</p>
+<p>I guess someone must have pointed out, wait a minute, there’s also the same impedance mismatch when you’re interacting with XML data- why are we limiting ourselves to relational databases?</p>
+<p>And then Erik Meijer came along<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> and said, query comprehension can be represented as a monad, so we can do all these things, and make it work for in-memory objects too, and reactive streams, and any queryable we can think of!</p>
+<p>Now Pandora’s Monad<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> is open, the M-word is floating around the hallways and people are getting into heated discussions about the Yoneda Lemma and the co-Yoneda lemma. Your coworkers are saying, look at Haskell, these problems have been <em>solved</em> in a general way for years!</p>
+<p>It must have been tempting to just blindly retrofit functional concepts into C# and tell developers to just <code>fmap</code> and <code>fold</code> and <code>bind</code> to their heart’s content. But they didn’t, because immediately grasping the utility of these concepts is almost impossible at first glance, so they stuck a particular abstraction level and stuck with it. I guess a part of it could have been that C#’s type system can’t actually represent monads, but to me it looked like a concious design decision to solve the problem at an appropriate level of abstraction.</p>
+
+  </div>
+   <a href="../posts/2016-03-15-functional-cs.html"><b>More...</b></a>
+   
+   <p>
+   <br>
+   <br>
+   <br>
+
+  </p><h1 class="preview-title">
     <a href="../posts/2015-09-14-prerender-mathjax.html" style="background-image: none">Prerendering MathJax</a>
   </h1> 
   <div class="preview-info">
@@ -198,7 +226,7 @@
   </p><p>
   
   </p><div class="preview">
-     <p>In <a href="../posts/2016-01-24-free-monad-theory.html">the next part</a> of this series, we’ll discuss free monads from a category theory perspective. This first installment will be decidedly more practical, focusing on how you actually <em>use</em> free monads in Haskell, and what advantages they bring. This means I’ll gloss over a lot of the mechanics of how free monads actually <em>work</em>, and make this more of a “get it done” kind of post.</p>
+     <p>In <a href="../posts/2016-03-23-free-monads.html">the next part</a> of this series, we’ll discuss free monads from a category theory perspective. This first installment will be decidedly more practical, focusing on how you actually <em>use</em> free monads in Haskell, and what advantages they bring. This means I’ll gloss over a lot of the mechanics of how free monads actually <em>work</em>, and make this more of a “get it done” kind of post.</p>
 <h2 id="the-finest-imperative-language">The finest imperative language?</h2>
 <p>Simon Peyton-Jones famously said that Haskell was the world’s finest imperative programming language. When I started writing Haskell, however, I literally tacked <code>-&gt; IO ()</code> onto the end of all my functions and went to town writing imperative code.</p>
 <p>Of course, not <em>all</em> the functions I wrote returned an <code>IO ()</code>, but because that was the only tool that I had to interact with the outside world, a great deal of my code- far more than necessary- simply lived inside the IO monad.</p>
@@ -280,38 +308,6 @@ keyExchangeHandler p state ip portNumber handle <span class="fu">=</span> <span 
 
   </div>
    <a href="../posts/2015-07-02-suspend.html"><b>More...</b></a>
-   
-   <p>
-   <br>
-   <br>
-   <br>
-
-  </p><h1 class="preview-title">
-    <a href="../posts/2015-05-11-chaum.html" style="background-image: none">Dog Fur Donuts</a>
-  </h1> 
-  <div class="preview-info">
-  
-    Part I of the series <i>Diffie-Hellman key exchange</i>.
-  
-  <div><i>May 11, 2015</i></div>
-  </div>
-  <p>
-  </p><p>
-  
-  </p><div class="preview">
-     <h2 id="perfectly-secure">Perfectly Secure</h2>
-<p>“I have it!”, Alice yells out to anyone who can hear her. Donuts are stacked precariously around her, gleaming in the fluorescents of her parents’ kitchen. She feels like a giant in a confectionery skyline. Which is what she wants, really. Her donut stand is about to pay for a new TV for the living room, entitling her to watch an entire season of <em>House of Cards</em>. Dad had <em>promised</em>.</p>
-<div class="figure">
-<img src="../images/alice.png" alt="Figure 1 · Alice, eight year-old donut prodigy.">
-<p class="caption"><em>Figure 1</em> · Alice, eight year-old donut prodigy.</p>
-</div>
-<p>Alice holds her wooden spoon aloft, victorious. She’s just created the most delicious donut her neighborhood will ever taste. But first, she’s got to check with her best friend, Bob, who <em>really</em> knows donuts…</p>
-<p>The spoon lowers as she remembers Bob’s sister, Eve, a teenage brat who steals all of Alice’s recipes and posts them on a recipe site, where they are Five Starred and accrue glowing comments<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Alice has tried to use codewords for ingredients, or writing in really tiny letters, but somehow the recipes keep popping up online, just a few hours after Alice sends the recipe to Bob.</p>
-<p><em>No way it’s happening to this recipe,</em> Alice thinks. She needs a secure way to send her recipe to Bob, so that even if Eve intercepts <em>everything</em> Alice sends, Eve won’t be able to make any sense of it.</p>
-<p>Alice brings up Google and slowly types her search query: <em>perfect encryption</em>.</p>
-
-  </div>
-   <a href="../posts/2015-05-11-chaum.html"><b>More...</b></a>
    
    <p>
    <br>
