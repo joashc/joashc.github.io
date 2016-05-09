@@ -249,7 +249,7 @@
     <span class="kw">&lt;/span&gt;</span>
   <span class="kw">&lt;/span&gt;</span>
 <span class="kw">&lt;/span&gt;</span></code></pre></div>
-<p>It didn’t look like the most efficient method of encoding an <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-1396" class="mjx-math" role="math"><span id="MJXc-Node-1397" class="mjx-mrow"><span id="MJXc-Node-1398" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.519em; padding-bottom: 0.298em;">A</span></span></span></span></span>, but it also looked like the amount of entropy the prerendering added might not be as large as the filesize delta suggested. I decided to see how much the rendered markup compressed:</p>
+<p>It didn’t look like the most efficient method of encoding an <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-944" class="mjx-math" role="math"><span id="MJXc-Node-945" class="mjx-mrow"><span id="MJXc-Node-946" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.519em; padding-bottom: 0.298em;">A</span></span></span></span></span>, but it also looked like the amount of entropy the prerendering added might not be as large as the filesize delta suggested. I decided to see how much the rendered markup compressed:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">gzip</span> -c _site/posts/prerenderedPost.html <span class="kw">|</span> <span class="kw">wc</span> -c</code></pre></div>
 <p>and I found that the 243kb could be compressed down to 24kb. This was a compression ratio of 10%; the original file only compressed at 26%. I decided that the file size wasn’t as big an issue as I’d initially supposed:</p>
 <ul>
