@@ -12,7 +12,7 @@
     </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Singer</title>
+    <title>Generalized Algebraic Data Types II</title>
     <!--
      <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
@@ -154,44 +154,233 @@
             <a href="../projects.html">Projects</a>
           </div>
         </header>
-          <h1 class="preview-title">Singer</h1> 
+          <h1 class="preview-title">Generalized Algebraic Data Types II</h1> 
 <div class="preview-info">
 
-<div><i>May  4, 2014</i></div>
+  Part V of the series <i>Fun with Functional C#</i>.
+
+<div><i>May 10, 2016</i></div>
 </div>
 <p>
 
-</p><h2 id="i.">I.</h2>
-<p>I feel compelled to talk about Peter Singer’s moral philosophy for a bit, because I think he makes a distinction that is often elided in many discussions. Singer’s philosophy is only obliquely/ analogically related to the thrust of this post, so don’t come away thinking that I want to inculcate you with Singer’s philosophy or anything<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
-<p>Singer is an act utilitarian, which roughly means he thinks morality is defined by actions and their effect on the sum total of good<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, and more specifically, a hedonistic act utilitarian, which means he thinks the good may be defined as the net suffering or happiness of sentient beings. Importantly, this forms the <em>only</em> basis for judging moral values, so actions are moral only and exactly to the extent that they affect suffering or happiness. That’s basically all that’s in the Singer Starter Kit- the rest is spectacularly extrapolated from there.</p>
-<p>That unflinching internal self-consistency is what’s so seductive about Peter Singer’s work. Just like you aren’t forced to accept that Euclidean geometry maps directly onto physical reality<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> to nonetheless go all mushy when we trudge along the hypotenuse from axiomatic base camp to soaring propositional summit, you don’t have to be a hedonistic utilitarian to be positively enchanted when Singer sets things up just right and these elegant little moral precepts come pirouetting out, and you gingerly pick them up and sort of heft them in your palms and just watch them go about their day.</p>
+</p><p>This is the second of two articles on GADTs. This first part was a general introduction to GADTs and their utility, while this second part will show how we can wrangle GADT behaviour out of C#.</p>
+<h2 id="adts-in-c">ADTs in C#</h2>
+<p>GADTs are tricky to implement in C#- GADTs are an extension of ADTs, and C# doesn’t even have ADTs! Let’s lay out what we need before we start implementing GADTs.</p>
+<h3 id="product-types">Product types</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Pair</span> a b <span class="fu">=</span> <span class="dt">Pair</span> a b</code></pre></div>
+<p>We can emulate product types in C# with classes and properties. We don’t get a lot of language niceties, but it’s effectively the same thing:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">class</span> Pair&lt;A, B&gt; 
+{
+  A a;
+  B b;
+
+  <span class="fu">Pair</span>(A a, B b) 
+  {
+    <span class="kw">this</span>.<span class="fu">a</span> = a;
+    <span class="kw">this</span>.<span class="fu">b</span> = b;
+  }
+}</code></pre></div>
 <!--more-->
-<p>Here’s one such precept: if all that morality entails is maximising the hedonia of all sentient beings, then the people I care about the most aren’t really any more important than some random dudes from Papua New Guinea. Is that the right way to think? Can I even think that way? <em>Behave</em> that way?</p>
-<h2 id="ii.">II.</h2>
-<p>Singer often gets asked like, if morality requires us to treat everyone’s conscious experience equally, aren’t we then obliged to donate everything we have, until giving away even a single cent more would make us more destitute than the chumps we’re donating to in the first place, i.e.&nbsp;that’s clearly a dumb idea? And to this apparent reductio, Singer gives an answer<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> that, in a Gödelian move, manages to break out of the hypothetical in which it was framed, and yet, in a decidedly un-Gödelian manner, remain consistent in this brave new metaverse it’s found itself in.</p>
-<p>The answer he gives is basically: you’re right. You’re right, he says, we should give everything away, but if you went around telling People that they were immoral for not sobbing into their sackcloth shirts, trying to get People to basically starve themselves in a hyperrational response to the suffering of faceless millions, People would simply shrug their shoulders and roll up their sleeves and just get down to the business of being immoral, if being moral entails being cold and miserable and hungry.</p>
-<h2 id="iii.">III.</h2>
-<p>And now we home in on the point- that no matter how you construct your moral philosophy, making People feel morally worthless is unlikely to also make them feel charitable. If you happen to construct your moral philosophy like Peter Singer, where the <em>only</em> things that matter are the consequences, you would say this is a Bad Thing; even if it is true that someone is acting in a morally inferior way, you shouldn’t tell them if it’s likely to make them behave even worse. Telling People They’re Immoral is itself an action that may be subsumed within the utilitarian framework! So it’s possible that the logic of the philosophy could produce the normative claim:</p>
-<blockquote>
-<p><span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-1242" class="mjx-math" role="math"><span id="MJXc-Node-1243" class="mjx-mrow"><span id="MJXc-Node-1244" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span>: <em>give away everything you don’t need</em></p>
-</blockquote>
-<p>while also producing the normative claim:</p>
-<blockquote>
-<p><span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-1245" class="mjx-math" role="math"><span id="MJXc-Node-1246" class="mjx-mrow"><span id="MJXc-Node-1247" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.182em;">Y</span></span></span></span></span>: <em>don’t tell people</em> <span id="MathJax-Element-3-Frame" class="mjx-chtml"><span id="MJXc-Node-1248" class="mjx-math" role="math"><span id="MJXc-Node-1249" class="mjx-mrow"><span id="MJXc-Node-1250" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span></p>
-</blockquote>
-<p>which prima facie seems rather weird, and maybe even a failing of the philosophy, but which Singer just views as a tension, maybe an inescapable one, given the taut, high-psi reality of criss-crossing interests and values that moral philosophy attempts to catalog and disentangle. Maybe it’s just true that what we should do, and what we say about what we should do, inevitably come apart- not just as a practical concession, but as a moral imperative- as in it can be immoral, <em>objectively</em> immoral, to tell people to do something that’s <em>objectively</em> the right thing to do.</p>
-<h2 id="iv.">IV.</h2>
-<p>Singer makes a distinction between the <em>meaning</em> of a statement, and the <em>effect</em> that a statement would have if it was broadly promulgated. And that’s a really interesting distinction that I think is often glossed over, even though it crops up a great deal.</p>
-<p>In some cases, this is a pretty trivial distinction; the fact that “Mars has two moons” doesn’t have much to do with the effect that it would have on someone if you told them. But it so happens that statement <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-1251" class="mjx-math" role="math"><span id="MJXc-Node-1252" class="mjx-mrow"><span id="MJXc-Node-1253" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span>- “give away everything you don’t need”- makes a normative claim, and you could also make a normative claim about the effect that <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-1254" class="mjx-math" role="math"><span id="MJXc-Node-1255" class="mjx-mrow"><span id="MJXc-Node-1256" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span> would have on people. The <em>meaning</em> of <span id="MathJax-Element-6-Frame" class="mjx-chtml"><span id="MJXc-Node-1257" class="mjx-math" role="math"><span id="MJXc-Node-1258" class="mjx-mrow"><span id="MJXc-Node-1259" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span> operates in the same domain as the <em>effect</em> of <span id="MathJax-Element-7-Frame" class="mjx-chtml"><span id="MJXc-Node-1260" class="mjx-math" role="math"><span id="MJXc-Node-1261" class="mjx-mrow"><span id="MJXc-Node-1262" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span>, so you get this kind of weird, almost self-referential behaviour, where evaluating <span id="MathJax-Element-8-Frame" class="mjx-chtml"><span id="MJXc-Node-1263" class="mjx-math" role="math"><span id="MJXc-Node-1264" class="mjx-mrow"><span id="MJXc-Node-1265" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.024em;">X</span></span></span></span></span> in that domain requires you to reach a sort of equilibrium between the meaning and the effect.</p>
-<div class="footnotes">
-<hr>
-<ol>
-<li id="fn1"><p>I actually think that hedonistic utilitarianism is incomplete, at best.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>Which prima facie sounds like a relatively uncontroversial claim, but is by no means a consensus view among moral philosophers, and arrives with a number of caveats that don’t emerge until doing the hard work of iterating through edge cases, thought experiments, etc.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>It doesn’t.<a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p>Singer is keen to bite the bullet on this point, and even seems to enjoy chewing on it at length. This is characteristic of Singer, and to the analytically-inclined, it seems like a rather natural move. This does, however, make him controversial among those that simply hear about his conclusions amputated from their chain of reasoning, and won’t indulge said bullet-chewing as justification.<a href="#fnref4">↩</a></p></li>
-</ol>
-</div>
+<h3 id="sum-types">Sum types</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Either</span> a b <span class="fu">=</span> <span class="dt">Left</span> a <span class="fu">|</span> <span class="dt">Right</span> b</code></pre></div>
+<p>Sum types are a bit trickier than product types to emulate in C#. We can use an interface to represent the type, and classes as the value constructors:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">interface</span> Either&lt;A, B&gt;{}
+
+<span class="kw">class</span> Left&lt;A&gt; : Either&lt;A, B&gt;
+{
+  A a;
+  <span class="fu">Left</span>(A a) 
+  {
+    <span class="kw">this</span>.<span class="fu">a</span> = a;
+  }
+}
+
+<span class="kw">class</span> Right&lt;B&gt; : Either&lt;A, B&gt;
+{
+  B b;
+  <span class="fu">Right</span>(B b)
+  {
+    <span class="kw">this</span>.<span class="fu">b</span> = b;
+  }
+}</code></pre></div>
+<h2 id="the-expression-evaluator-in-c">The expression evaluator in C#</h2>
+<p>Let’s try to recreate the expression evaluator from the last post. We’ll begin with the expression sum type:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">interface</span> Expr {}
+
+<span class="kw">public</span> <span class="kw">class</span> Val : Expr
+{
+  <span class="kw">public</span> <span class="dt">int</span> val;
+}
+
+<span class="kw">public</span> <span class="kw">class</span> Add : Expr
+{
+  <span class="kw">public</span> Expr e1;
+  <span class="kw">public</span> Expr e2;
+}
+
+<span class="kw">public</span> <span class="kw">class</span> Mult : Expr
+{
+  <span class="kw">public</span> Expr e1;
+  <span class="kw">public</span> Expr e2;
+}</code></pre></div>
+<p>For convenience, let’s define wrapper functions for our constructors:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Val <span class="fu">val</span>(<span class="dt">int</span> val)
+{
+    <span class="kw">return</span> <span class="kw">new</span> Val { val = val };
+}
+
+<span class="kw">public</span> Mult <span class="fu">mult</span>(Expr e1, Expr e2)
+{
+    <span class="kw">return</span> <span class="kw">new</span> Mult { e1 = e1, e2 = e2 };
+}
+
+<span class="kw">public</span> Add <span class="fu">add</span>(Expr e1, Expr e2)
+{
+    <span class="kw">return</span> <span class="kw">new</span> Add { e1 = e1, e2 = e2 };
+}</code></pre></div>
+<p>Now we can define expressions like this:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="co">// (3 * 2) + 6</span>
+<span class="dt">var</span> expression = <span class="fu">add</span>(<span class="fu">mult</span>(<span class="fu">val</span>(<span class="dv">3</span>), <span class="fu">val</span>(<span class="dv">2</span>)), <span class="fu">val</span>(<span class="dv">6</span>));</code></pre></div>
+<h3 id="evaluator">Evaluator</h3>
+<p>Here’s where things start to get tricky. The most obvious way to implement the evaluator is to use multiple dispatch:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="dt">int</span> <span class="fu">Eval</span>(Val e)
+{
+    <span class="kw">return</span> e.<span class="fu">val</span>;
+}
+
+<span class="kw">public</span> <span class="dt">int</span> <span class="fu">Eval</span>(Add e)
+{
+    <span class="co">// Invalid!</span>
+    <span class="kw">return</span> <span class="fu">Eval</span>(e.<span class="fu">e1</span>) + <span class="fu">Eval</span>(e.<span class="fu">e2</span>);
+}
+
+<span class="kw">public</span> <span class="dt">int</span> <span class="fu">Eval</span>(Mult e)
+{
+    <span class="co">// Also invalid!</span>
+    <span class="kw">return</span> <span class="fu">Eval</span>(e.<span class="fu">e1</span>) * <span class="fu">Eval</span>(e.<span class="fu">e2</span>);
+}</code></pre></div>
+<p>But this code won’t compile. We can see why if we look at the <code>Add</code> overload of <code>Eval</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">return</span> <span class="fu">Eval</span>(e.<span class="fu">e1</span>) + <span class="fu">Eval</span>(e.<span class="fu">e2</span>);</code></pre></div>
+<p>The type of <code>e.e1</code> is <code>Expr</code>, and we don’t have an overload for this type! Even if we have overloads for every implementation of <code>Expr</code>, C# will only look for an overload for <code>Expr</code>. We could write something like:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="dt">int</span> <span class="fu">Eval</span>(Expr e) 
+{
+  <span class="kw">if</span> (e <span class="kw">is</span> Val)
+  {
+    <span class="dt">var</span> val = e <span class="kw">as</span> Val;
+    <span class="kw">return</span> val.<span class="fu">val</span>;
+  }
+  <span class="kw">if</span> (e <span class="kw">is</span> Add)
+  {
+    <span class="dt">var</span> add = e <span class="kw">as</span> Add;
+    <span class="kw">return</span> <span class="fu">Eval</span>(e.<span class="fu">e1</span>) + <span class="fu">Eval</span>(e.<span class="fu">e2</span>);
+  }
+  <span class="kw">if</span> (e <span class="kw">is</span> Mult) 
+  {
+    <span class="dt">var</span> mult = e <span class="kw">as</span> Mult;
+    <span class="kw">return</span> <span class="fu">Eval</span>(e.<span class="fu">e1</span>) * <span class="fu">Eval</span>(e.<span class="fu">e2</span>);
+  }
+  <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">ArgumentException</span>();
+}</code></pre></div>
+<p>But this is ugly and error-prone. If we add a new expression type, our code will happily compile, only to crash with a runtime error.</p>
+<h2 id="take-2">Take 2</h2>
+<p>We can use the Visitor pattern to solve a lot of these issues. Let’s start by defining an evaluator interface- our visitor in the visitor pattern.</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">interface</span> Evaluator&lt;X&gt;
+{
+  X <span class="fu">Val</span>(<span class="dt">int</span> val);
+  X <span class="fu">Add</span>(Expr e1, Expr e2);
+  X <span class="fu">Mult</span>(Expr e1, Expr e2);
+}</code></pre></div>
+<p>Now, if we add a new expression type, we only need to add it to this evaluator interface to make all implemented evaluators throw a compile error, insead of a runtime error.</p>
+<p>Next, we add this evaluator interface to our expression sum type.</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">interface</span> Expr
+{
+  X Eval&lt;X&gt;(Evaluator&lt;X&gt; evaluator);
+}
+
+<span class="kw">public</span> <span class="kw">class</span> Val : Expr
+{
+  <span class="kw">public</span> <span class="dt">int</span> val;
+
+  <span class="kw">public</span> X Eval&lt;X&gt;(Evaluator&lt;X&gt; evaluator) 
+  {
+    <span class="kw">return</span> evaluator.<span class="fu">Val</span>(val);
+  }
+}
+
+<span class="kw">public</span> <span class="kw">class</span> Add : Expr
+{
+  <span class="kw">public</span> Expr e1;
+  <span class="kw">public</span> Expr e2;
+
+  <span class="kw">public</span> X Eval&lt;X&gt;(Evaluator&lt;X&gt; evaluator) 
+  {
+    <span class="kw">return</span> evaluator.<span class="fu">Add</span>(e1, e2);
+  }
+}
+
+<span class="kw">public</span> <span class="kw">class</span> Mult : Expr
+{
+  <span class="kw">public</span> Expr e1;
+  <span class="kw">public</span> Expr e2;
+
+  <span class="kw">public</span> X Eval&lt;X&gt;(Evaluator&lt;X&gt; evaluator) 
+  {
+    <span class="kw">return</span> evaluator.<span class="fu">Mult</span>(e1, e2);
+  }
+}</code></pre></div>
+<h3 id="the-results">The results</h3>
+<p>Let’s see if this works by defining an evaluator:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">class</span> ResultEvaluator : Evaluator&lt;<span class="dt">int</span>&gt;
+{
+    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">Add</span>(Expr e1, Expr e2)
+    {
+        <span class="kw">return</span> e1.<span class="fu">Eval</span>(<span class="kw">this</span>) + e2.<span class="fu">Eval</span>(<span class="kw">this</span>);
+    }
+
+    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">Mult</span>(Expr e1, Expr e2)
+    {
+        <span class="kw">return</span> e1.<span class="fu">Eval</span>(<span class="kw">this</span>) * e2.<span class="fu">Eval</span>(<span class="kw">this</span>);
+    }
+
+    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">Val</span>(<span class="dt">int</span> val)
+    {
+        <span class="kw">return</span> val;
+    }
+}</code></pre></div>
+<p>Now we can construct an expression and evaluate it!</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="co">// (3 * 2) + 6</span>
+<span class="dt">var</span> expression = <span class="fu">add</span>(<span class="fu">mult</span>(<span class="fu">val</span>(<span class="dv">3</span>), <span class="fu">val</span>(<span class="dv">2</span>)), <span class="fu">val</span>(<span class="dv">6</span>));
+
+expression.<span class="fu">Eval</span>(<span class="kw">new</span> <span class="fu">ResultEvaluator</span>());
+<span class="co">// 12</span></code></pre></div>
+<p>Implementing a new evaluator is as easy as implementing the evaluator interface:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">class</span> PrettyPrinter : Evaluator&lt;<span class="dt">string</span>&gt;
+{
+    <span class="kw">public</span> <span class="dt">string</span> <span class="fu">Add</span>(Expr e1, Expr e2)
+    {
+        <span class="kw">return</span> $<span class="st">"({e1.Eval(this)} + {e2.Eval(this)})"</span>;
+    }
+
+    <span class="kw">public</span> <span class="dt">string</span> <span class="fu">Mult</span>(Expr e1, Expr e2)
+    {
+        <span class="kw">return</span> $<span class="st">"({e1.Eval(this)} * {e2.Eval(this)})"</span>;
+
+    }
+
+    <span class="kw">public</span> <span class="dt">string</span> <span class="fu">Val</span>(<span class="dt">int</span> val)
+    {
+        <span class="kw">return</span> val.<span class="fu">ToString</span>();
+    }
+}</code></pre></div>
+<p>Now we can evaluate the same expression in completely different ways:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="dt">var</span> expression = <span class="fu">add</span>(<span class="fu">mult</span>(<span class="fu">val</span>(<span class="dv">3</span>), <span class="fu">val</span>(<span class="dv">2</span>)), <span class="fu">val</span>(<span class="dv">6</span>));
+
+expression.<span class="fu">Eval</span>(<span class="kw">new</span> <span class="fu">ResultEvaluator</span>());
+<span class="co">// 12</span>
+
+expression.<span class="fu">Eval</span>(<span class="kw">new</span> <span class="fu">PrettyPrinter</span>());
+<span class="co">// "((3 * 2) + 6)"</span></code></pre></div>
+<p>tbc…</p>
 
 <div class="info">
 </div>

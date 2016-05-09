@@ -157,6 +157,46 @@
           <br>
 
   <h1 class="preview-title">
+    <a href="../posts/2016-03-16-reader.html" style="background-image: none">The Reader Monad</a>
+  </h1> 
+  <div class="preview-info">
+  
+    Part II of the series <i>Fun with Functional C#</i>.
+  
+  <div><i>March 16, 2016</i></div>
+  </div>
+  <p>
+  </p><p>
+  
+  </p><div class="preview">
+     <p>In this installment of <em>Fun with Functional C#</em>, we’re going to be implementing the reader monad, and attempting to figure out if it’s actually useful. The reader monad was the first monad I implemented when I found out that <code>SelectMany</code> was <code>bind</code>. I thought it would be a good way to get rid of runtime dependency injection errors, but it turned out not to be the panacea I’d hoped for.</p>
+<h2 id="implementation">Implementation</h2>
+<p>The first thing I did was implement <code>SelectMany</code>, but it had some quirks that I’ll discuss in the next installment of this series. For now, let’s just look at the implementation:</p>
+<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> Reader&lt;E, A&gt;
+{
+    <span class="kw">private</span> Func&lt;E, A&gt; f;
+    <span class="kw">public</span> Reader(Func&lt;E, A&gt; func) 
+    {
+        f = func;
+    }
+
+    <span class="kw">public</span> A <span class="fu">RunReader</span>(E env) 
+    {
+        <span class="kw">return</span> <span class="fu">f</span>(env);
+    }
+}</code></pre></div>
+<p>This is basically equivalent to</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">newtype</span> <span class="dt">Reader</span> e a <span class="fu">=</span> <span class="dt">Reader</span> {<span class="ot"> runReader ::</span> (e <span class="ot">-&gt;</span> a) }</code></pre></div>
+
+  </div>
+   <a href="../posts/2016-03-16-reader.html"><b>More...</b></a>
+   
+   <p>
+   <br>
+   <br>
+   <br>
+
+  </p><h1 class="preview-title">
     <a href="../posts/2016-03-15-functional-cs.html" style="background-image: none">Functional C#</a>
   </h1> 
   <div class="preview-info">
@@ -272,42 +312,6 @@ keyExchangeHandler p state ip portNumber handle <span class="fu">=</span> <span 
 
   </div>
    <a href="../posts/2015-08-22-attacks.html"><b>More...</b></a>
-   
-   <p>
-   <br>
-   <br>
-   <br>
-
-  </p><h1 class="preview-title">
-    <a href="../posts/2015-07-02-suspend.html" style="background-image: none">Macbook-style Suspend on Linux</a>
-  </h1> 
-  <div class="preview-info">
-  
-  <div><i>July  2, 2015</i></div>
-  </div>
-  <p>
-  </p><p>
-  
-  </p><div class="preview">
-     <h2 id="macbook-envy">Macbook envy</h2>
-<p>Macbooks enter suspend really gracefully, which is something I never really missed on my Arch box until I actually started using suspend<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Here’s how I got my computer to:</p>
-<ul>
-<li><p>Dim the display twenty seconds before suspend</p></li>
-<li><p>Cancel dimming and suspend if any mouse or keyboard input was detected during that twenty seconds</p></li>
-<li><p>Not dim/suspend if there was any sound playing</p></li>
-</ul>
-<h2 id="how-even-do-you-suspend">How even do you suspend?</h2>
-<p>A quick trip to the Arch wiki tells me that suspend works out of the box with a <code>systemctl suspend</code>. That was great, but I didn’t want to manually put my computer to sleep every time I thought I wouldn’t be using it for a little while.</p>
-<h2 id="attempt-1-xautolock">Attempt 1: <code>xautolock</code></h2>
-<p><code>xautolock</code> checks if there isn’t any X Window activity within a certain interval, then calls an arbitrary command. I tried it out:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">xautolock</span> -time 2 -corners x-xx -locker <span class="st">"systemctl suspend"</span></code></pre></div>
-<p>The <code>-corners x-xx</code> parameter meant that moving the mouse into the top right-hand corner would disable the autosuspend, which I thought would be pretty useful for watching videos.</p>
-<p>This worked fine, except that I’d be looking at something for a little while, and if I didn’t touch my mouse or keyboard, my computer would suddenly suspend itself. Fortunately, <code>xautolock</code> has a <code>-notify</code> flag, which lets you run a command some interval before the actual suspend.</p>
-<p>Some people had the <code>-notify</code> set up for a <code>notify-send</code> call, but I didn’t want to start using an entire notification system just for getting notified of an impending standby, and the notification systems I did try didn’t play very nicely with i3.</p>
-<p>I decided to keep looking.</p>
-
-  </div>
-   <a href="../posts/2015-07-02-suspend.html"><b>More...</b></a>
    
    <p>
    <br>

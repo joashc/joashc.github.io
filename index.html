@@ -157,6 +157,45 @@
           <br>
 
   <h1 class="preview-title">
+    <a href="./posts/2016-05-10-gadts-ii.html" style="background-image: none">Generalized Algebraic Data Types II</a>
+  </h1> 
+  <div class="preview-info">
+  
+    Part V of the series <i>Fun with Functional C#</i>.
+  
+  <div><i>May 10, 2016</i></div>
+  </div>
+  <p>
+  </p><p>
+  
+  </p><div class="preview">
+     <p>This is the second of two articles on GADTs. This first part was a general introduction to GADTs and their utility, while this second part will show how we can wrangle GADT behaviour out of C#.</p>
+<h2 id="adts-in-c">ADTs in C#</h2>
+<p>GADTs are tricky to implement in C#- GADTs are an extension of ADTs, and C# doesn’t even have ADTs! Let’s lay out what we need before we start implementing GADTs.</p>
+<h3 id="product-types">Product types</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Pair</span> a b <span class="fu">=</span> <span class="dt">Pair</span> a b</code></pre></div>
+<p>We can emulate product types in C# with classes and properties. We don’t get a lot of language niceties, but it’s effectively the same thing:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">class</span> Pair&lt;A, B&gt; 
+{
+  A a;
+  B b;
+
+  <span class="fu">Pair</span>(A a, B b) 
+  {
+    <span class="kw">this</span>.<span class="fu">a</span> = a;
+    <span class="kw">this</span>.<span class="fu">b</span> = b;
+  }
+}</code></pre></div>
+
+  </div>
+   <a href="./posts/2016-05-10-gadts-ii.html"><b>More...</b></a>
+   
+   <p>
+   <br>
+   <br>
+   <br>
+
+  </p><h1 class="preview-title">
     <a href="./posts/2016-05-09-gadts.html" style="background-image: none">Generalized Algebraic Data Types I</a>
   </h1> 
   <div class="preview-info">
@@ -277,46 +316,6 @@
 
   </div>
    <a href="./posts/2016-03-17-select-many-weird.html"><b>More...</b></a>
-   
-   <p>
-   <br>
-   <br>
-   <br>
-
-  </p><h1 class="preview-title">
-    <a href="./posts/2016-03-16-reader.html" style="background-image: none">The Reader Monad</a>
-  </h1> 
-  <div class="preview-info">
-  
-    Part II of the series <i>Fun with Functional C#</i>.
-  
-  <div><i>March 16, 2016</i></div>
-  </div>
-  <p>
-  </p><p>
-  
-  </p><div class="preview">
-     <p>In this installment of <em>Fun with Functional C#</em>, we’re going to be implementing the reader monad, and attempting to figure out if it’s actually useful. The reader monad was the first monad I implemented when I found out that <code>SelectMany</code> was <code>bind</code>. I thought it would be a good way to get rid of runtime dependency injection errors, but it turned out not to be the panacea I’d hoped for.</p>
-<h2 id="implementation">Implementation</h2>
-<p>The first thing I did was implement <code>SelectMany</code>, but it had some quirks that I’ll discuss in the next installment of this series. For now, let’s just look at the implementation:</p>
-<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> Reader&lt;E, A&gt;
-{
-    <span class="kw">private</span> Func&lt;E, A&gt; f;
-    <span class="kw">public</span> Reader(Func&lt;E, A&gt; func) 
-    {
-        f = func;
-    }
-
-    <span class="kw">public</span> A <span class="fu">RunReader</span>(E env) 
-    {
-        <span class="kw">return</span> <span class="fu">f</span>(env);
-    }
-}</code></pre></div>
-<p>This is basically equivalent to</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">newtype</span> <span class="dt">Reader</span> e a <span class="fu">=</span> <span class="dt">Reader</span> {<span class="ot"> runReader ::</span> (e <span class="ot">-&gt;</span> a) }</code></pre></div>
-
-  </div>
-   <a href="./posts/2016-03-16-reader.html"><b>More...</b></a>
    
    <p>
    <br>
