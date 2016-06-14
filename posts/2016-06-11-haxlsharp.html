@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Projects</title>
+    <title>How does HaxlSharp work?</title>
     <!--
      <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
@@ -18,7 +18,7 @@
         -->
 <script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
 <script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
-   <link rel="stylesheet" type="text/css" href="./css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
+   <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="only x">
   </head>
 
   <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
@@ -141,88 +141,118 @@
       <div class="cell">
         <header class="row">
           <div class="home">
-            <a href="./">Blog</a>
-            <a href="./archive.html">Archive</a>
-            <a href="./projects.html">Projects</a>
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
           </div>
         </header>
-          <h1>Projects</h1>
+          <h1 class="preview-title">How does HaxlSharp work?</h1> 
+<div class="preview-info">
 
-
-  <h2>Probabilistic C#</h2> 
-<div class="info">
+<div><i>June 11, 2016</i></div>
 </div>
 <p>
-<a href="https://github.com/joashc/csharp-probability-monad">https://github.com/joashc/csharp-probability-monad</a>
 
-</p><p>A monadic probabilistic programming framework for Bayesian modelling and inference in C#.</p>
+</p><p>I wrote a C# version of <a href="https://github.com/facebook/Haxl">Haxl</a> called <a href="https://github.com/joashc/HaxlSharp">HaxlSharp</a>. The original Haxl paper by Marlow, et al. is brilliantly titled <em><a href="http://community.haskell.org/~simonmar/papers/haxl-icfp14.pdf">There is no Fork: an Abstraction for Efficient, Concurrent, and Concise Data Access</a></em>, and provides a great overview of Haxl. This post will focus more on the <em>differences</em> between the original Haskell implementation and my C# implementation.</p>
+<h2 id="what-is-fetch">What is <code>Fetch&lt;&gt;</code>?</h2>
+<p>In HaxlSharp, we use query syntax to combine functions that return <code>Fetch&lt;&gt;</code> objects. Let’s say we have these three <code>Fetch&lt;&gt;</code> objects/ functions:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Fetch&lt;<span class="dt">string</span>&gt; a;
+Fetch&lt;<span class="dt">int</span>&gt; b;
+Func&lt;<span class="dt">string</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt; c;</code></pre></div>
+<p>We can combine them like this:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from x <span class="kw">in</span> a
+from y <span class="kw">in</span> b
+from z <span class="kw">in</span> <span class="fu">c</span>(a)
+select y + z;</code></pre></div>
+<p><code>Fetch&lt;&gt;</code> is actually a free monad that collects lambda expression trees instead of lambda functions.</p>
+<p>It divides these expression trees into groups of expressions that can be written applicatively, using a version of the <code>ApplicativeDo</code> algorithm that was recently merged into GHC<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
+<!--more-->
+<h3 id="a-brief-aside-on-applicativedo">A brief aside on <code>ApplicativeDo</code></h3>
+<p>If <code>ApplicativeDo</code> finds two monadic bind statements that can be expressed applicatively:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE ApplicativeDo #-}</span>
+a <span class="ot">&lt;-</span> x
+b <span class="ot">&lt;-</span> y</code></pre></div>
+<p>it will rewrite them as:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">(a, b) <span class="ot">&lt;-</span> (,) <span class="fu">&lt;$&gt;</span> x <span class="fu">&lt;*&gt;</span> y</code></pre></div>
+<p>Generalizing to more than two statements is trivial. For instance, in this expression:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE ApplicativeDo #-}</span>
+a <span class="ot">&lt;-</span> x
+b <span class="ot">&lt;-</span> y
+c <span class="ot">&lt;-</span> z
+d <span class="ot">&lt;-</span> q a b c
+e <span class="ot">&lt;-</span> r a c d
+<span class="co">-- etc</span></code></pre></div>
+<p>the first three statements can be rewritten applicatively:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">(a, b, c) <span class="ot">&lt;-</span> (,,) <span class="fu">&lt;$&gt;</span> x <span class="fu">&lt;*&gt;</span> y <span class="fu">&lt;*&gt;</span> z</code></pre></div>
+<p>Because of tuple destructuring and nested lambdas, subsequent monadic binds will have <code>a</code>, <code>b</code>, and <code>c</code> in scope:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">(,,) <span class="fu">&lt;$&gt;</span> x <span class="fu">&lt;*&gt;</span> y <span class="fu">&lt;*&gt;</span> z <span class="fu">&gt;&gt;=</span>
+  \(a, b, c) <span class="ot">-&gt;</span> q a b c <span class="fu">&gt;&gt;=</span>
+    \d <span class="ot">-&gt;</span> r a c d
+      \e <span class="ot">-&gt;</span> <span class="co">--etc</span></code></pre></div>
+<p>Here’s where things start to diverge from the Haskell version. C# doesn’t have tuple destructuring, nor does it desugar query expressions into nested lambdas. Overload resolution on nested lambdas has an appalling asymptotic complexity, so the C# compiler desugars query expressions using <em>transparent identifiers</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> that emulate the scoping behaviour of nested lambdas.</p>
+<p>Unfortunately, transparent identifiers are meant to be an internal compiler implementation detail, and aren’t really accessible to us as library authors. If we want to mess around with the scoping behaviour of our lambda expressions- which we do if we want to rewrite them applicatively- we need to ditch transparent identifiers completely, and use our own scoping system.</p>
+<h3 id="haxlsharp-scoping">HaxlSharp scoping</h3>
+<p>In C#, we’d write that <code>ApplicativeDo</code> example like this:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from a <span class="kw">in</span> x
+from b <span class="kw">in</span> y
+from c <span class="kw">in</span> z
+from d <span class="kw">in</span> <span class="fu">q</span>(a, b, c)
+from e <span class="kw">in</span> <span class="fu">r</span>(a, c, d)</code></pre></div>
+<p>Let’s say that these are all of type <code>Fetch&lt;int&gt;</code>. We will get four<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> bind lambda expression trees:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Expression&lt;Func&lt;<span class="dt">int</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind1 = a =&gt; y;
+
+Expression&lt;Func&lt;<span class="dt">int</span>, <span class="dt">int</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind2 = (a, b) =&gt; z;
+
+Expression&lt;Func&lt;TRANS0&lt;<span class="dt">int</span>, <span class="dt">int</span>&gt;, <span class="dt">int</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind3 = (ti0, c) =&gt; <span class="fu">q</span>(ti0.<span class="fu">a</span>, ti0.<span class="fu">b</span>, c);
+
+Expression&lt;Func&lt;TRANS1&lt;TRANS0&lt;<span class="dt">int</span>, <span class="dt">int</span>&gt;, <span class="dt">int</span>&gt;, <span class="dt">int</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind4 = (ti1, d) =&gt; <span class="fu">r</span>(ti1.<span class="fu">ti0</span>.<span class="fu">a</span>, ti1.<span class="fu">c</span>, d);</code></pre></div>
+<p>We can’t really manipulate transparent identifiers, so we rewrite all these expresions to take a <code>Scope</code> object, which is basically a <code>Dictionary&lt;string, object&gt;</code> that can spawn child scopes.</p>
+<p>Here’s the expressions rewritten as <code>Expression&lt;Func&lt;Scope, Fetch&lt;int&gt;&gt;&gt;</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Expression&lt;Func&lt;Scope, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind1 = scope =&gt; y;
+
+Expression&lt;Func&lt;Scope, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind2 = scope =&gt; z;
+
+Expression&lt;Func&lt;Scope, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind3 = scope =&gt; 
+  <span class="fu">q</span>((<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"a"</span>), (<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"b"</span>), (<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"c"</span>));
+
+Expression&lt;Func&lt;Scope, Fetch&lt;<span class="dt">int</span>&gt;&gt;&gt;
+bind4 = scope =&gt; 
+  <span class="fu">r</span>((<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"a"</span>), (<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"c"</span>), (<span class="dt">int</span>)scope.<span class="fu">Get</span>(<span class="st">"d"</span>));</code></pre></div>
+<p>All transparent identifier and parameter accesses have been replaced with scope accessors.</p>
+<p>If we have a nested <code>Fetch&lt;&gt;</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">var fetch1 = 
+  from a <span class="kw">in</span> x
+  from b <span class="kw">in</span> y
+  from c <span class="kw">in</span> z
+  select <span class="fu">tuple</span>(a, b, c);
+
+var fetch2 = 
+  from a <span class="kw">in</span> x
+  from b <span class="kw">in</span> fetch1
+  select <span class="fu">tuple</span>(a, b);</code></pre></div>
+<p><code>fetch1</code> will be given a child scope, so it can access the parent variable <code>a</code> without polluting the scope of the parent.</p>
+<h3 id="fetching">Fetching</h3>
+<p>All our expressions now assume every value they use is present in the scope. We ensure this by running applicative groups concurrently and awaiting their completion. Once the applicative group fetching is complete, we write the results to the scope with their respective variable names, and then pass this populated scope to the next applicative group, and so on.</p>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>You can check out the proposal <a href="https://ghc.haskell.org/trac/ghc/wiki/ApplicativeDo">here</a>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>See <em><a href="2016-03-17-select-many-weird.html#the-of-the-show">Why is SelectMany so weird?</a></em> for details on transparent identifiers.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>The initial lambda is simply <code>() =&gt; x</code>.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>
 
 <div class="info">
 </div>
-
-
-  <h2>Sequential Trial Simulator</h2> 
-<div class="info">
-</div>
-<p>
-<a href="https://joashc.github.io/STS">https://joashc.github.io/STS</a>
-
-</p><p>This application allows the visualisation of the stochastic properties of an arbitrary sequential study, helping investigators design and plan first-in-human trials whilst balancing patient safety and overall cost-effectiveness.</p>
-<p>It was initially implemented by our team in three days for Health Hack 2015. But because I wasn’t happy with such a rushed job, I took a few days out to completely reimplement it using React and Redux. It was also an excuse to see undo/redo trivially implemented in the app, which I thought was pretty cool.</p>
-<p>The source code is at <a href="https://github.com/joashc/STS" class="uri">https://github.com/joashc/STS</a>.</p>
-
-<div class="info">
-</div>
-
-
-  <h2>cryptodiner</h2> 
-<div class="info">
-</div>
-<p>
-<a href="https://github.com/joashc/cryptodiner">https://github.com/joashc/cryptodiner</a>
-
-</p><p>A Haskell implementation of Chaum’s dining cryptographers protocol, using <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-459" class="mjx-math" role="math"><span id="MJXc-Node-460" class="mjx-mrow"><span id="MJXc-Node-461" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.04em;"><span id="MJXc-Node-462" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em; padding-right: 0.04em;">Z</span></span></span><span class="mjx-stack" style="vertical-align: -0.157em;"><span class="mjx-sup" style="font-size: 70.7%; padding-bottom: 0.255em; padding-left: 0.144em; padding-right: 0.071em;"><span id="MJXc-Node-464" class="mjx-mo" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.151em; padding-bottom: 0.298em;">∗</span></span></span><span class="mjx-sub" style="font-size: 70.7%; padding-right: 0.071em;"><span id="MJXc-Node-463" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.446em;">p</span></span></span></span></span></span></span></span> Diffie-Hellman, for cryptographically secure anonymous communication. Uses STM to manage concurrency, and the whole thing is structured with the free monad. It currently uses a star-shaped network topology; I’m thinking of using a DHT to make it truly decentralised.</p>
-
-<div class="info">
-</div>
-
-
-  <h2>ProcessBus</h2> 
-<div class="info">
-</div>
-<p>
-<a href="https://github.com/joashc/ProcessBus">https://github.com/joashc/ProcessBus</a>
-
-</p><p>This is an abstraction layer over <a href="https://github.com/louthy/language-ext/">LanguageExt.Process</a> for declaratively specifying service bus messaging topologies. It was really an excuse to use LanguageExt and see how far you could take the functional style in C#- I actually began writing it in Haskell and then “translating” it to C#.</p>
-<p>It only works with LanguageExt.Process, but I found that the Redis persistence was far too slow to be useful over multiple machines. I might break out the declarative messaging topology part and make it work with arbitrary transport layers.</p>
-
-<div class="info">
-</div>
-
-
-  <h2>AutoCrop</h2> 
-<div class="info">
-</div>
-<p>
-<a href="https://github.com/joashc/AutoCrop">https://github.com/joashc/AutoCrop</a>
-
-</p><p>Android library that allows you to automatically crop white borders from images, according to LAB colour space deltas. It includes an extended ImageView that automatically crops images.</p>
-<p>I wrote this because I was writing an application that displayed a lot of book cover images, which for some reason seem to always have an ugly white border around them.</p>
-
-<div class="info">
-</div>
-
-
-  <h2>neuralnet</h2> 
-<div class="info">
-</div>
-<p>
-<a href="https://github.com/joashc/neuralnet/">https://github.com/joashc/neuralnet/</a>
-
-</p><p>A really basic neural network, implemented in Haskell.</p>
-
-<div class="info">
-</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
 
 
 

@@ -1,15 +1,5 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
-       <script src="https://use.typekit.net/geg0pqq.js"></script><script>
-        (function(d) {
-          var config = {
-            kitId: 'geg0pqq',
-            scriptTimeout: 3000,
-            async: true
-          },
-          h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-        })(document);
-    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Posts</title>
@@ -26,6 +16,8 @@
         <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
         </script>
         -->
+<script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
+<script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
    <link rel="stylesheet" type="text/css" href="./css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
   </head>
 
@@ -157,38 +149,61 @@
           <br>
 
   <h1 class="preview-title">
-    <a href="./posts/2016-05-10-gadts-ii.html" style="background-image: none">Generalized Algebraic Data Types II</a>
+    <a href="./posts/2016-06-11-haxlsharp.html" style="background-image: none">How does HaxlSharp work?</a>
   </h1> 
   <div class="preview-info">
   
-    Part V of the series <i>Fun with Functional C#</i>.
-  
-  <div><i>May 10, 2016</i></div>
+  <div><i>June 11, 2016</i></div>
   </div>
   <p>
   </p><p>
   
   </p><div class="preview">
-     <p>This is the second of two articles on GADTs. This first part was a general introduction to GADTs and their utility, while this second part will show how we can wrangle GADT behaviour out of C#.</p>
-<h2 id="adts-in-c">ADTs in C#</h2>
-<p>GADTs are tricky to implement in C#- GADTs are an extension of ADTs, and C# doesn’t even have ADTs! Let’s lay out what we need before we start implementing GADTs.</p>
-<h3 id="product-types">Product types</h3>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Pair</span> a b <span class="fu">=</span> <span class="dt">Pair</span> a b</code></pre></div>
-<p>We can emulate product types in C# with classes and properties. We don’t get a lot of language niceties, but it’s effectively the same thing:</p>
-<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">class</span> Pair&lt;A, B&gt; 
-{
-  A a;
-  B b;
-
-  <span class="fu">Pair</span>(A a, B b) 
-  {
-    <span class="kw">this</span>.<span class="fu">a</span> = a;
-    <span class="kw">this</span>.<span class="fu">b</span> = b;
-  }
-}</code></pre></div>
+     <p>I wrote a C# version of <a href="https://github.com/facebook/Haxl">Haxl</a> called <a href="https://github.com/joashc/HaxlSharp">HaxlSharp</a>. The original Haxl paper by Marlow, et al. is brilliantly titled <em><a href="http://community.haskell.org/~simonmar/papers/haxl-icfp14.pdf">There is no Fork: an Abstraction for Efficient, Concurrent, and Concise Data Access</a></em>, and provides a great overview of Haxl. This post will focus more on the <em>differences</em> between the original Haskell implementation and my C# implementation.</p>
+<h2 id="what-is-fetch">What is <code>Fetch&lt;&gt;</code>?</h2>
+<p>In HaxlSharp, we use query syntax to combine functions that return <code>Fetch&lt;&gt;</code> objects. Let’s say we have these three <code>Fetch&lt;&gt;</code> objects/ functions:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Fetch&lt;<span class="dt">string</span>&gt; a;
+Fetch&lt;<span class="dt">int</span>&gt; b;
+Func&lt;<span class="dt">string</span>, Fetch&lt;<span class="dt">int</span>&gt;&gt; c;</code></pre></div>
+<p>We can combine them like this:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from x <span class="kw">in</span> a
+from y <span class="kw">in</span> b
+from z <span class="kw">in</span> <span class="fu">c</span>(a)
+select y + z;</code></pre></div>
+<p><code>Fetch&lt;&gt;</code> is actually a free monad that collects lambda expression trees instead of lambda functions.</p>
+<p>It divides these expression trees into groups of expressions that can be written applicatively, using a version of the <code>ApplicativeDo</code> algorithm that was recently merged into GHC<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
 
   </div>
-   <a href="./posts/2016-05-10-gadts-ii.html"><b>More...</b></a>
+   <a href="./posts/2016-06-11-haxlsharp.html"><b>More...</b></a>
+   
+   <p>
+   <br>
+   <br>
+   <br>
+
+  </p><h1 class="preview-title">
+    <a href="./posts/2016-06-10-async-await.html" style="background-image: none">What's wrong with async/ await?</a>
+  </h1> 
+  <div class="preview-info">
+  
+  <div><i>June 10, 2016</i></div>
+  </div>
+  <p>
+  </p><p>
+  
+  </p><div class="preview">
+     <p>Async/ await is great for writing sequential-looking code when you’re only waiting for a single asynchronous request at a time. But we often want to combine information from multiple data sources, like different calls on the same API, or multiple remote APIs.</p>
+<p>The async/ await abstraction breaks down in these situations<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. To illustrate, let’s say we have a blogging site, and a post’s metadata and content are retrieved using separate API calls. We could use async/ await to fetch both these pieces of information:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Task&lt;PostDetails&gt; <span class="fu">GetPostDetails</span>(<span class="dt">int</span> postId)
+{
+    <span class="dt">var</span> postInfo = await <span class="fu">FetchPostInfo</span>(postId);
+    <span class="dt">var</span> postContent = await <span class="fu">FetchPostContent</span>(postId);
+    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">PostDetails</span>(postInfo, postContent);
+}</code></pre></div>
+<p>Here, we’re making two successive <code>await</code> calls, which means the execution will be suspended at the first request- <code>FetchPostInfo</code>- and only begin executing the second request- <code>FetchPostContent</code>- once the first request has completed.</p>
+<p>But fetching <code>FetchPostContent</code> doesn’t require the result of <code>FetchPostInfo</code>, which means we could have started both these requests concurrently! Async/ await lets us write <em>asynchronous</em> code in a nice, sequential-looking way, but doesn’t let us write <em>concurrent</em> code like this. 
+  </p></div>
+   <a href="./posts/2016-06-10-async-await.html"><b>More...</b></a>
    
    <p>
    <br>
@@ -284,38 +299,6 @@
 
   </div>
    <a href="./posts/2016-03-23-free-monads.html"><b>More...</b></a>
-   
-   <p>
-   <br>
-   <br>
-   <br>
-
-  </p><h1 class="preview-title">
-    <a href="./posts/2016-03-17-select-many-weird.html" style="background-image: none">Why is SelectMany so weird?</a>
-  </h1> 
-  <div class="preview-info">
-  
-    Part III of the series <i>Fun with Functional C#</i>.
-  
-  <div><i>March 17, 2016</i></div>
-  </div>
-  <p>
-  </p><p>
-  
-  </p><div class="preview">
-     <p>This episode, we’ll be looking at why <code>SelectMany</code> will look so strange to Haskell users, why that’s linked to some implementation-level issues with C#, and the extremely cool way that the C# team got around those issues.</p>
-<p>A quick recap: LINQ query syntax is actually just Haskell do-notation, specialized for the list monad.</p>
-<p>We can see this by looking at the signature for <code>SelectMany</code>:</p>
-<div class="sourceCode"><pre class="sourceCode java"><code class="sourceCode java">IEnumerable&lt;B&gt; SelectMany&lt;A, B&gt;(
-  <span class="kw">this</span> IEnumerable&lt;A&gt; source,
-  Func&lt;A, IEnumerable&lt;B&gt;&gt; selector
-)</code></pre></div>
-<p>It’s a less polymorphic Haskell bind:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">bind ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b</code></pre></div>
-<p>When I first saw this, I immediately attempted to write my own monad instance in C#, and had a Bad Time. But figuring out why it wasn’t so easy was probably more interesting than writing the monad instances in the first place!</p>
-
-  </div>
-   <a href="./posts/2016-03-17-select-many-weird.html"><b>More...</b></a>
    
    <p>
    <br>

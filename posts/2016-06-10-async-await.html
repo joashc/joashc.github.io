@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>What's wrong with async/ await?</title>
+    <!--
+     <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                displayAlign: "left",
+                showProcessingMessages: false,
+                showMathMenu: true,
+                messageStyle: "none",
+                TeX: { TagSide: "left", equationNumbers: { autoNumber: "AMS" } }
+            });
+        </script>
+        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+        </script>
+        -->
+<script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
+<script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
+   <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
+  </head>
+
+  <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
+.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
+.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
+.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
+.mjx-math * {display: inline-block; text-align: left}
+.mjx-numerator {display: block; text-align: center}
+.mjx-denominator {display: block; text-align: center}
+.MJXc-stacked {height: 0; position: relative}
+.MJXc-stacked > * {position: absolute}
+.MJXc-bevelled > * {display: inline-block}
+.mjx-stack {display: inline-block}
+.mjx-op {display: block}
+.mjx-under {display: table-cell}
+.mjx-over {display: block}
+.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-stack > .mjx-sup {display: block}
+.mjx-stack > .mjx-sub {display: block}
+.mjx-prestack > .mjx-presup {display: block}
+.mjx-prestack > .mjx-presub {display: block}
+.mjx-delim-h > .mjx-char {display: inline-block}
+.mjx-surd {vertical-align: top}
+.mjx-mphantom * {visibility: hidden}
+.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
+.mjx-annotation-xml {line-height: normal}
+.mjx-menclose > svg {fill: none; stroke: currentColor}
+.mjx-mtr {display: table-row}
+.mjx-mlabeledtr {display: table-row}
+.mjx-mtd {display: table-cell; text-align: center}
+.mjx-label {display: block}
+.mjx-box {display: inline-block}
+.mjx-block {display: block}
+.mjx-span {display: span}
+.mjx-char {display: block; white-space: pre}
+.mjx-itable {display: inline-table}
+.mjx-row {display: table-row}
+.mjx-cell {display: table-cell}
+.mjx-table {display: table; width: 100%}
+.mjx-line {display: block; height: 0}
+.mjx-strut {width: 0; padding-top: 1em}
+.mjx-vsize {width: 0}
+.MJXc-space1 {margin-left: .167em}
+.MJXc-space2 {margin-left: .222em}
+.MJXc-space3 {margin-left: .278em}
+.mjx-ex-box-test {position: absolute; width: 1px; height: 60ex}
+.MJXc-TeX-unknown-R {font-family: monospace; font-style: normal; font-weight: normal}
+.MJXc-TeX-unknown-I {font-family: monospace; font-style: italic; font-weight: normal}
+.MJXc-TeX-unknown-B {font-family: monospace; font-style: normal; font-weight: bold}
+.MJXc-TeX-unknown-BI {font-family: monospace; font-style: italic; font-weight: bold}
+.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
+.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
+.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
+.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
+.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
+.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
+.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
+.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
+.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
+.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
+.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
+.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
+.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
+.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
+.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
+.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
+.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
+.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
+.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
+@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
+@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
+@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
+@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
+@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
+@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
+@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
+@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
+@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
+@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
+@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
+@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
+@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
+@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
+@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
+@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
+@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
+@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
+@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
+@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
+@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
+@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
+@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
+@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
+</style>
+    <main role="main">
+    <article class="row article post" role="article">
+      <div class="cell">
+        <header class="row">
+          <div class="home">
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
+          </div>
+        </header>
+          <h1 class="preview-title">What's wrong with async/ await?</h1> 
+<div class="preview-info">
+
+<div><i>June 10, 2016</i></div>
+</div>
+<p>
+
+</p><p>Async/ await is great for writing sequential-looking code when you’re only waiting for a single asynchronous request at a time. But we often want to combine information from multiple data sources, like different calls on the same API, or multiple remote APIs.</p>
+<p>The async/ await abstraction breaks down in these situations<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. To illustrate, let’s say we have a blogging site, and a post’s metadata and content are retrieved using separate API calls. We could use async/ await to fetch both these pieces of information:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Task&lt;PostDetails&gt; <span class="fu">GetPostDetails</span>(<span class="dt">int</span> postId)
+{
+    <span class="dt">var</span> postInfo = await <span class="fu">FetchPostInfo</span>(postId);
+    <span class="dt">var</span> postContent = await <span class="fu">FetchPostContent</span>(postId);
+    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">PostDetails</span>(postInfo, postContent);
+}</code></pre></div>
+<p>Here, we’re making two successive <code>await</code> calls, which means the execution will be suspended at the first request- <code>FetchPostInfo</code>- and only begin executing the second request- <code>FetchPostContent</code>- once the first request has completed.</p>
+<p>But fetching <code>FetchPostContent</code> doesn’t require the result of <code>FetchPostInfo</code>, which means we could have started both these requests concurrently! Async/ await lets us write <em>asynchronous</em> code in a nice, sequential-looking way, but doesn’t let us write <em>concurrent</em> code like this. <!--more--></p>
+<h3 id="composing-async-methods">Composing async methods</h3>
+<p>To make matters worse, we can easily call our inefficient <code>GetPostDetails</code> method from another method, compounding the oversequentialization:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Task&lt;IEnumerable&lt;PostDetails&gt; <span class="fu">LatestPostContent</span>()
+{
+  <span class="dt">var</span> latest = await <span class="fu">GetTwoLatestPostIds</span>();
+  <span class="dt">var</span> first = await <span class="fu">GetPostDetails</span>(latest.<span class="fu">Item1</span>);
+  <span class="dt">var</span> second = await <span class="fu">GetPostDetails</span>(latest.<span class="fu">Item2</span>);
+  <span class="kw">return</span> <span class="kw">new</span> List&lt;PostContent&gt;{first, second};
+}</code></pre></div>
+<p>This code will sequentially execute four<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> calls that could have been executed concurrently!</p>
+<p>The only way around this is to give up the sequential-looking code, and manually deal with the concurrency by sprinkling our code with <code>Task.WhenAll</code>.</p>
+<p>But hang on, async/await was designed to solve these problems:</p>
+<ul>
+<li>Writing asynchronous code is error-prone</li>
+<li>Asynchronous code obscures the meaning of what we’re trying to achieve</li>
+<li>Programmers are bad at reasoning about asynchronous code</li>
+</ul>
+<p>Giving up our sequential abstraction means these exact problems have reemerged!</p>
+<ul>
+<li>Writing <strong>concurrent</strong> code is error-prone</li>
+<li><strong>Concurrent</strong> code obscures the meaning of what we’re trying to achieve</li>
+<li>Programmers are bad at reasoning about <strong>concurrent</strong> code</li>
+</ul>
+<h2 id="a-solution-automatic-batching-and-deduplication">A solution: automatic batching and deduplication</h2>
+<p>Facebook has written an excellent Haskell library called <a href="https://github.com/facebook/Haxl">Haxl</a> that attempts to address these issues. Unfortunately, not many people have the luxury of using Haskell, so I’ve written a C# library named <a href="https://github.com/joashc/HaxlSharp">HaxlSharp</a> that does something similar. And soon I’ll see if I can coerce ES6 generators to do something similar in Javascript.</p>
+<p>Haxl allows us to write code that <em>looks</em> sequential, but is capable of being analyzed to determine the requests we can fetch concurrently, and then automatically batch these requests together.</p>
+<p>It also only fetches duplicate requests once, even if the duplicate requests are started concurrently- something we can’t achieve with <code>Task.WhenAll</code>.</p>
+<p>Let’s rewrite <code>GetPostDetails</code> using HaxlSharp:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Fetch&lt;PostDetails&gt; <span class="fu">GetPostDetails</span>(<span class="dt">int</span> postId)
+{
+    <span class="kw">return</span> from info <span class="kw">in</span> <span class="fu">FetchPostInfo</span>(postId);
+           from content <span class="kw">in</span> <span class="fu">FetchPostContent</span>(postId);
+           select <span class="kw">new</span> <span class="fu">PostDetails</span>(info, content);
+}</code></pre></div>
+<p>The framework can automatically work out that these calls can be parallelized. Here’s the debug log from when we fetch <code>GetPostDetails(1)</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">== Batch ====
+Fetched 'info': PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}
+Fetched 'content': Post <span class="dv">1</span>
+
+==== Result ====
+PostDetails { Info: PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}, Content: 'Post <span class="dv">1</span>' }</code></pre></div>
+<p>Both requests were automatically placed in a single batch and fetched concurrently!</p>
+<h3 id="composing-fetches">Composing fetches</h3>
+<p>Let’s compose our new <code>GetPostDetails</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Fetch&lt;List&lt;PostDetails&gt;&gt; <span class="fu">GetLatestPostDetails</span>()
+{
+  <span class="kw">return</span> from latest <span class="kw">in</span> <span class="fu">FetchTwoLatestPostIds</span>()
+         <span class="co">// We must wait here</span>
+         from first <span class="kw">in</span> <span class="fu">GetPostDetails</span>(latest.<span class="fu">Item1</span>)
+         from second <span class="kw">in</span> <span class="fu">GetPostDetails</span>(latest.<span class="fu">Item2</span>)
+         select <span class="kw">new</span> List&lt;PostDetails&gt; { first, second };
+}</code></pre></div>
+<p>If we fetch this, we get:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">==== Batch ====
+Fetched 'latest': (<span class="dv">0</span>, <span class="dv">1</span>)
+
+==== Batch ====
+Fetched 'content': Post <span class="dv">1</span>
+Fetched 'info': PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}
+Fetched 'content': Post <span class="dv">0</span>
+Fetched 'info': PostInfo { Id: <span class="dv">0</span>, Date: <span class="dv">11</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}
+
+==== Result ====
+[ PostDetails { Info: PostInfo { Id: <span class="dv">0</span>, Date: <span class="dv">11</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}, Content: 'Post <span class="dv">0</span>' },
+PostDetails { Info: PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}, Content: 'Post <span class="dv">1</span>' } ]</code></pre></div>
+<p>The framework has worked out that we have to wait for the first call’s result before continuing, because we rely on this result to execute our subsequent calls. But the subsequent two calls only depend on <code>latest</code>, so once <code>latest</code> is fetched, they can both be fetched concurrently!</p>
+<p>Note that we made two parallelizable calls to <code>GetPostDetails</code>, which is itself made up of two parallelizable requests. These requests were “pulled out” and placed into a single batch of four concurrent requests. Let’s see what happens if we rewrite <code>GetPostDetails</code> so that it must make two sequential requests:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> Fetch&lt;PostDetails&gt; <span class="fu">GetPostDetails</span>(<span class="dt">int</span> postId)
+{
+    <span class="kw">return</span> from info <span class="kw">in</span> <span class="fu">FetchPostInfo</span>(postId);
+           <span class="co">// We need to wait for the result of info before we can get this id!</span>
+           from content <span class="kw">in</span> <span class="fu">FetchPostContent</span>(info.<span class="fu">Id</span>);
+           select <span class="kw">new</span> <span class="fu">PostDetails</span>(info, content);
+}</code></pre></div>
+<p>when we fetch <code>GetLatestPostDetails</code>, we get:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">==== Batch ====
+Fetched 'latest': (<span class="dv">0</span>, <span class="dv">1</span>)
+
+==== Batch ====
+Fetched 'info': PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}
+Fetched 'info': PostInfo { Id: <span class="dv">0</span>, Date: <span class="dv">11</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}
+
+==== Batch ====
+Fetched 'content': Post <span class="dv">1</span>
+Fetched 'content': Post <span class="dv">0</span>
+
+==== Result ====
+[ PostDetails { Info: PostInfo { Id: <span class="dv">0</span>, Date: <span class="dv">11</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}, Content: 'Post <span class="dv">0</span>' },
+PostDetails { Info: PostInfo { Id: <span class="dv">1</span>, Date: <span class="dv">10</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}, Content: 'Post <span class="dv">1</span>' } ]</code></pre></div>
+<p>The <code>info</code> requests within <code>GetPostDetails</code> can be fetched with just the result of <code>latest</code>, so they were batched together. The remaining <code>content</code> batch can resume once the <code>info</code> batch completes.</p>
+<h3 id="caching-request-deduplication">Caching/ Request deduplication</h3>
+<p>Because we lazily compose our requests, we can keep track of every subrequest within a particular request, and only fetch a particular subrequest once, even if they’re part of the same batch.</p>
+<p>Let’s say that each post has an author, and each author has three best friends. We could fetch the friends of the author of a given post like this:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">static</span> Fetch&lt;IEnumerable&lt;Person&gt;&gt; <span class="fu">PostAuthorFriends</span>(<span class="dt">int</span> postId)
+{
+    <span class="kw">return</span> from info <span class="kw">in</span> <span class="fu">FetchPostInfo</span>(postId)
+           from author <span class="kw">in</span> <span class="fu">GetPerson</span>(info.<span class="fu">AuthorId</span>)
+           from friends <span class="kw">in</span> author.<span class="fu">BestFriendIds</span>.<span class="fu">SelectFetch</span>(GetPerson)
+           select friends;
+}</code></pre></div>
+<p>Here, we’re using <code>SelectFetch</code><a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>, which lets us run a request for every item in a list, and get back the list of results. Let’s fetch <code>PostAuthorFriends(3)</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">==== Batch ====
+Fetched 'info': PostInfo { Id: <span class="dv">3</span>, Date: <span class="dv">8</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}
+
+==== Batch ====
+Fetched 'author': Person { PersonId: <span class="dv">19</span>, Name: Johnie Wengerd, BestFriendIds: [ <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">14</span> ]  }
+
+==== Batch ====
+Fetched 'friends[<span class="dv">2</span>]': Person { PersonId: <span class="dv">14</span>, Name: Michal Zakrzewski, BestFriendIds: [ <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span> ]  }
+Fetched 'friends[<span class="dv">0</span>]': Person { PersonId: <span class="dv">10</span>, Name: Shandra Hanlin, BestFriendIds: [ <span class="dv">13</span>, <span class="dv">15</span>, <span class="dv">17</span> ]  }
+Fetched 'friends[<span class="dv">1</span>]': Person { PersonId: <span class="dv">12</span>, Name: Peppa Pig, BestFriendIds: [ <span class="dv">19</span>, <span class="dv">1</span>, <span class="dv">3</span> ]  }
+
+==== Result ====
+[ Person { PersonId: <span class="dv">10</span>, Name: Shandra Hanlin, BestFriendIds: [ <span class="dv">13</span>, <span class="dv">15</span>, <span class="dv">17</span> ]  },
+  Person { PersonId: <span class="dv">12</span>, Name: Peppa Pig, BestFriendIds: [ <span class="dv">19</span>, <span class="dv">1</span>, <span class="dv">3</span> ]  },
+  Person { PersonId: <span class="dv">14</span>, Name: Michal Zakrzewski, BestFriendIds: [ <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span> ]  } ]</code></pre></div>
+<p>Here, we run <code>GetPerson</code> on the list of three <code>BestFriendIds</code>, and get a list of three <code>Person</code> objects. Let’s try to get some duplicate requests:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from ids <span class="kw">in</span> <span class="fu">FetchTwoLatestPosts</span>()
+from friends1 <span class="kw">in</span> <span class="fu">PostAuthorFriends</span>(ids.<span class="fu">Item1</span>)
+from friends2 <span class="kw">in</span> <span class="fu">PostAuthorFriends</span>(ids.<span class="fu">Item2</span>)
+select friends1.<span class="fu">Concat</span>(friends2);</code></pre></div>
+<p>Fetching this gives us:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">==== Batch ====
+Fetched 'ids': (<span class="dv">3</span>, <span class="dv">4</span>)
+
+==== Batch ====
+Fetched 'info': PostInfo { Id: <span class="dv">3</span>, Date: <span class="dv">8</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">0</span>'}
+Fetched 'info': PostInfo { Id: <span class="dv">4</span>, Date: <span class="dv">7</span>/<span class="dv">06</span>/<span class="dv">2016</span>, Topic: 'Topic <span class="dv">1</span>'}
+
+==== Batch ====
+Fetched 'author': Person { PersonId: <span class="dv">12</span>, Name: Peppa Pig, BestFriendIds: [ <span class="dv">19</span>, <span class="dv">1</span>, <span class="dv">3</span> ]  }
+Fetched 'author': Person { PersonId: <span class="dv">19</span>, Name: Johnie Wengerd, BestFriendIds: [ <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">14</span> ]  }
+
+==== Batch ====
+Fetched 'friends[<span class="dv">0</span>]': Person { PersonId: <span class="dv">10</span>, Name: Shandra Hanlin, BestFriendIds: [ <span class="dv">13</span>, <span class="dv">15</span>, <span class="dv">17</span> ]  }
+Fetched 'friends[<span class="dv">2</span>]': Person { PersonId: <span class="dv">3</span>, Name: Corazon Benito, BestFriendIds: [ <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span> ]  }
+Fetched 'friends[<span class="dv">1</span>]': Person { PersonId: <span class="dv">1</span>, Name: Cristal Hornak, BestFriendIds: [ <span class="dv">16</span>, <span class="dv">18</span>, <span class="dv">0</span> ]  }
+Fetched 'friends[<span class="dv">2</span>]': Person { PersonId: <span class="dv">14</span>, Name: Michal Zakrzewski, BestFriendIds: [ <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span> ]  }
+
+==== Result ====
+[ Person { PersonId: <span class="dv">10</span>, Name: Shandra Hanlin, BestFriendIds: [ <span class="dv">13</span>, <span class="dv">15</span>, <span class="dv">17</span> ]  },
+  Person { PersonId: <span class="dv">12</span>, Name: Peppa Pig, BestFriendIds: [ <span class="dv">19</span>, <span class="dv">1</span>, <span class="dv">3</span> ]  },
+  Person { PersonId: <span class="dv">14</span>, Name: Michal Zakrzewski, BestFriendIds: [ <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span> ]  },
+  Person { PersonId: <span class="dv">1</span>, Name: Cristal Hornak, BestFriendIds: [ <span class="dv">16</span>, <span class="dv">18</span>, <span class="dv">0</span> ]  },
+  Person { PersonId: <span class="dv">19</span>, Name: Johnie Wengerd, BestFriendIds: [ <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">14</span> ]  },
+  Person { PersonId: <span class="dv">3</span>, Name: Corazon Benito, BestFriendIds: [ <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span> ]  } ]</code></pre></div>
+<p>Because Peppa Pig and Johnie Wengerd are each other’s best friends, we don’t need to fetch them again when we’re fetching their best friends. The fourth batch, where the best friends of Peppa and Johnie are fetched, only contains four requests, but the results are still correctly compiled into a list of six best friends.</p>
+<p>This is also helpful for consistency; even though data can change during a fetch, we can still ensure that we don’t get multiple versions of the same data within a single fetch.</p>
+<h2 id="usage">Usage</h2>
+<p>I’m in the process of completely rewriting this library, so details here are bound to change. I’m undecided on the API for this library; currently it’s similar to ServiceStack’s.</p>
+<h3 id="defining-requests">Defining requests</h3>
+<p>You can define requests with POCOs; just annotate their return type like so:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">class</span> FetchPostInfo : Returns&lt;PostInfo&gt;
+{
+    <span class="kw">public</span> <span class="kw">readonly</span> <span class="dt">int</span> PostId;
+    <span class="kw">public</span> <span class="fu">FetchPostInfo</span>(<span class="dt">int</span> postId)
+    {
+        PostId = postId;
+    }
+}</code></pre></div>
+<h3 id="using-the-requests">Using the requests</h3>
+<p>We need to convert these requests from a <code>Returns&lt;&gt;</code> into a <code>Fetch&lt;&gt;</code> if we want to get our concurrent fetching and composability:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Fetch&lt;PostInfo&gt; fetchInfo = <span class="kw">new</span> <span class="fu">FetchPostInfo</span>(<span class="dv">2</span>).<span class="fu">ToFetch</span>();</code></pre></div>
+<p>It’s a bit cumbersome to <code>new</code> up a request object every time we want to make a request, especially if we’re going to be composing them. So we can write a method that returns a <code>Fetch&lt;&gt;</code> for every request:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">static</span> Fetch&lt;PostInfo&gt; <span class="fu">GetPostInfo</span>(<span class="dt">int</span> postId)
+{
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fu">FetchPostInfo</span>(postId).<span class="fu">ToFetch</span>();
+}</code></pre></div>
+<p>Now we can compose any function that returns a <code>Fetch&lt;&gt;</code>, and they’ll be automatically batched as much as possible:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="kw">public</span> <span class="kw">static</span> Fetch&lt;PostDetails&gt; <span class="fu">GetPostDetails</span>(<span class="dt">int</span> postId) 
+{
+    <span class="kw">return</span> from info <span class="kw">in</span> <span class="fu">GetPostInfo</span>(postId)
+           from content <span class="kw">in</span> <span class="fu">GetPostContent</span>(postId)
+           select <span class="kw">new</span> <span class="fu">PostDetails</span>(info, content);
+}
+
+<span class="kw">public</span> <span class="kw">static</span> Fetch&lt;IEnumerable&lt;PostDetails&gt;&gt; <span class="fu">RecentPostDetails</span>() 
+{
+    <span class="kw">return</span> from postIds <span class="kw">in</span> <span class="fu">GetAllPostIds</span>()
+           from postDetails <span class="kw">in</span> postIds.<span class="fu">Take</span>(<span class="dv">10</span>).<span class="fu">SelectFetch</span>(getPostDetails)
+           select postDetails;
+}</code></pre></div>
+<h3 id="handling-requests">Handling requests</h3>
+<p>Of course, the data must come from somewhere, so we must create handlers for every request type. Handlers are just functions from the request type to the response type. Register these functions to create a <code>Fetcher</code> object:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs"><span class="dt">var</span> fetcher = FetcherBuilder.<span class="fu">New</span>()
+
+.<span class="fu">FetchRequest</span>&lt;FetchPosts, IEnumerable&lt;<span class="dt">int</span>&gt;&gt;(_ =&gt;
+{
+    <span class="kw">return</span> _postApi.<span class="fu">GetAllPostIds</span>();
+})
+
+.<span class="fu">FetchRequest</span>&lt;FetchPostInfo, PostInfo&gt;(req =&gt;
+{
+    <span class="kw">return</span> _postApi.<span class="fu">GetPostInfo</span>(req.<span class="fu">PostId</span>);
+})
+
+.<span class="fu">FetchRequest</span>&lt;FetchUser, User&gt;(req =&gt; {
+    <span class="kw">return</span> _userApi.<span class="fu">GetUser</span>(req.<span class="fu">UserId</span>);
+})
+
+.<span class="fu">Create</span>();</code></pre></div>
+<p>This object can be injected wherever you want to resolve a <code>Fetch&lt;A&gt;</code> into an <code>A</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">Fetch&lt;IEnumerable&lt;<span class="dt">string</span>&gt;&gt; getPopularContent =
+    from postIds <span class="kw">in</span> <span class="fu">GetAllPostIds</span>()
+    from views <span class="kw">in</span> postIds.<span class="fu">SelectFetch</span>(GetPostViews)
+    from popularPosts <span class="kw">in</span> views.<span class="fu">OrderByDescending</span>(v =&gt; v.<span class="fu">Views</span>)
+                             .<span class="fu">Take</span>(<span class="dv">5</span>)
+                             .<span class="fu">SelectFetch</span>(v =&gt; <span class="fu">GetPostContent</span>(v.<span class="fu">Id</span>))
+    select popularPosts;
+
+IEnumerable&lt;<span class="dt">string</span>&gt; popularContent = await fetcher.<span class="fu">Fetch</span>(getPopularContent);</code></pre></div>
+<p>Ideally, we should work within the <code>Fetch&lt;&gt;</code> monad as much as possible, and only resolve the final <code>Fetch&lt;&gt;</code> when absolutely necessary. This ensures the framework performs the fetches in the most efficient way.</p>
+<h3 id="fetching">Fetching</h3>
+<p>All our expressions now assume every value they use is present in the scope. We ensure this by running applicative groups concurrently and awaiting their completion. Once the applicative group fetching is complete, we write the results to the scope with their respective variable names, and then pass this populated scope to the next applicative group, and so on.</p>
+<h3 id="limitations">Limitations</h3>
+<p>This library is still in its very early stages! Here is a very incomplete list of its limitations:</p>
+<h4 id="speed">Speed</h4>
+<p>This is the most important one: it’s still very unoptimized, so it adds an overhead that might not pay for itself!</p>
+<p>Basic fetches that involve resolving less than 10 different primitive requests can generally run in around a millisecond.</p>
+<p>Queries written in the <code>Fetch</code> monad are actually treated as expression trees so they can be analysed to determine their dependencies. The expression trees are rewritten to maximise concurrency, and then compiled. Unfortunately, expression tree compilation is <em>slow</em> in C#!</p>
+<p>This makes <code>SelectFetch</code> very inefficient on larger lists, because it compiles multiple expression trees for each item in the list<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. The Haskell version seems to have a similar asymptotic complexity, but with a <em>much</em> smaller constant.</p>
+<h4 id="anonymous-types">Anonymous types</h4>
+<p>It’s not recommended to return anonymous types from your <code>Fetch</code> functions, unless you want your functions to fail unpredictably. C# uses anonymous types internally for query expressions, which is alright in the case of <a href="posts/2016-03-17-select-many-weird.html">transparent identifiers</a> because they’re tagged with a special name only available to the compiler, but <code>let</code> statements are translated into plain old anonymous types that are indistinguishable from the ones you could type in manually:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from a <span class="kw">in</span> x
+from b <span class="kw">in</span> y
+select <span class="kw">new</span> {a, b};</code></pre></div>
+<p>There a few checks in place so anonymous types won’t fail in all circumstances, but unless you want to make sure your expression doesn’t meet all of these criteria:</p>
+<ul>
+<li>Expression body is <code>ExpressionType.New</code></li>
+<li>Creates an anonymous type</li>
+<li>Anonymous type has exactly two properties</li>
+<li>First property of anonymous type is the same as the first parameter of the expression</li>
+</ul>
+<p>…you’re better off just not using anonymous types.</p>
+<h4 id="applicative-do">Applicative Do</h4>
+<p>We’re currently using a simplified version of the <code>ApplicativeDo</code> algorithm in GHC, so a query expression like:</p>
+<div class="sourceCode"><pre class="sourceCode cs"><code class="sourceCode cs">from x <span class="kw">in</span> a
+from y <span class="kw">in</span> <span class="fu">b</span>(x)
+from z <span class="kw">in</span> c</code></pre></div>
+<p>is executed in three batches, even though <code>a</code> and <code>c</code> could be started concurrently.</p>
+<h4 id="its-a-giant-hack">It’s a giant hack</h4>
+<p>The C# language spec goes to the effort of saying that the implementation details of query expression rewriting and scoping are <em>not</em> part of the specification, and different implementations of C# can do query rewriting/scoping differently.</p>
+<p>Of course, this library builds heavily on the internal, unspecified implementation details of query rewriting and scoping, so it’s possible that the C# team could reimplement it and break the library.</p>
+<p>I think the C# team kept transparent identifiers, etc. out of the spec because they knew they were a bit of a hack to get the desired transitive scoping behaviour, which actually <em>is</em> part of the spec. So this library is a hack raised upon a hack… but it’s called HaxlSharp, so at least the name is apt.</p>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>I’m discussing C# async/await here, but it applies equally to Javascript’s implementation.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>This method will:<br>
+<br>
+Wait for <code>GetTwoLatestPostIds</code>,<br>
+Then wait for the first <code>GetPostDetails</code> call, which involves:<br>
+Waiting for <code>FetchPostInfo</code>,<br>
+Then waiting for <code>FetchPostContent</code>,<br>
+Then wait for the second <code>GetPostDetails</code> call, again involving:<br>
+Waiting for <code>FetchPostInfo</code>,<br>
+Then waiting for <code>FetchPostContent</code><br>
+<br>
+Only the initial <code>GetTwoLatestPostIds</code> call requires us to wait; the rest can be executed concurrently.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><code>SelectFetch</code> has the signature <code>[a] -&gt; (a -&gt; Fetch a) -&gt; Fetch [a]</code>- basically a monomorphic <code>sequence</code>.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Idea for optimizing it: instead of compiling an expression tree for each item in the list <code>[a]</code>, I could compile the expression <code>a -&gt; Expression</code> once, and then plug <code>a</code> into this compiled expression. We’ll see how this works out.<a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
+
+
+
+
+        <div id="footer">
+          <small>Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+        </div>
+      </div>
+    </article>
+    </main>
+  
+
+</body></html>

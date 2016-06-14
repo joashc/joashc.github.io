@@ -1,15 +1,5 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
-       <script src="https://use.typekit.net/geg0pqq.js"></script><script>
-        (function(d) {
-          var config = {
-            kitId: 'geg0pqq',
-            scriptTimeout: 3000,
-            async: true
-          },
-          h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-        })(document);
-    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Posts</title>
@@ -26,6 +16,8 @@
         <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
         </script>
         -->
+<script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
+<script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
    <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
   </head>
 
@@ -157,6 +149,30 @@
           <br>
 
   <h1 class="preview-title">
+    <a href="../posts/2015-08-22-attacks.html" style="background-image: none">Attacking Diffie-Hellman</a>
+  </h1> 
+  <div class="preview-info">
+  
+    Part II of the series <i>Diffie-Hellman key exchange</i>.
+  
+  <div><i>August 22, 2015</i></div>
+  </div>
+  <p>
+  </p><p>
+  
+  </p><div class="preview">
+     <p>Part I of this series established the conceptual framework for Diffie-Hellman, so now we can turn to more pragmatic matters: attacks on Diffie-Hellman. Naively, the only way to calculate <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-3901" class="mjx-math" role="math"><span id="MJXc-Node-3902" class="mjx-mrow"><span id="MJXc-Node-3903" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span></span> where <span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-3904" class="mjx-math" role="math"><span id="MJXc-Node-3905" class="mjx-mrow"><span id="MJXc-Node-3906" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-3907" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-3908" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span><span id="MJXc-Node-3909" class="mjx-TeXmathchoice"><span id="MJXc-Node-3910" class="mjx-mspace" style="width: 0.444em; height: 0px;"></span></span><span id="MJXc-Node-3911" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3912" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-3913" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-3914" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3915" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-3916" class="mjx-mo MJXc-space3"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.077em; padding-bottom: 0.298em;">=</span></span><span id="MJXc-Node-3917" class="mjx-mi MJXc-space3"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span> is to calculate <span class="math display"><span class="mjx-chtml MJXc-display"><span id="MathJax-Element-3-Frame" class="mjx-chtml" style="width: 100%; min-width: 24.296em;"><span id="MJXc-Node-3918" class="mjx-math" style="width: 100%;" role="math"><span id="MJXc-Node-3919" class="mjx-mrow" style="width: 100%;"><span class="mjx-stack" style="width: 100%; vertical-align: 0;"><span class="mjx-block" style="text-align: center;"><span class="mjx-box"><span id="MJXc-Node-3920" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-3921" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-3922" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">1</span></span></span></span><span id="MJXc-Node-3923" class="mjx-TeXmathchoice"><span id="MJXc-Node-3924" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-3925" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3926" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-3927" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-3928" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3929" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-3930" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-3931" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-3932" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-3933" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">2</span></span></span></span><span id="MJXc-Node-3934" class="mjx-TeXmathchoice"><span id="MJXc-Node-3935" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-3936" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3937" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-3938" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-3939" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3940" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-3941" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-3942" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-3943" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-3944" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">3</span></span></span></span><span id="MJXc-Node-3945" class="mjx-TeXmathchoice"><span id="MJXc-Node-3946" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-3947" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3948" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-3949" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-3950" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3951" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-3952" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-3953" class="mjx-mo MJXc-space1"><span class="mjx-char MJXc-TeX-main-R" style="margin-top: -0.144em; padding-bottom: 0.372em;">…</span></span><span id="MJXc-Node-3954" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-3955" class="mjx-msubsup MJXc-space1"><span class="mjx-base"><span id="MJXc-Node-3956" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-3957" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span><span id="MJXc-Node-3958" class="mjx-TeXmathchoice"><span id="MJXc-Node-3959" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-3960" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3961" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-3962" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-3963" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3964" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span></span></span></span></span></span> until we hit a match. The worst case of this algorithm is <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-3965" class="mjx-math" role="math"><span id="MJXc-Node-3966" class="mjx-mrow"><span id="MJXc-Node-3967" class="mjx-texatom"><span id="MJXc-Node-3968" class="mjx-mrow"><span id="MJXc-Node-3969" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-3970" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3971" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-3972" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span>, which means that the time required to brute-force a shared key grows exponentially with the bitlength of the key.</p>
+<p>However, there’s a number of algorithms<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> that allow us to compute the discrete log of any finite cyclic group in about <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-3973" class="mjx-math" role="math"><span id="MJXc-Node-3974" class="mjx-mrow"><span id="MJXc-Node-3975" class="mjx-texatom"><span id="MJXc-Node-3976" class="mjx-mrow"><span id="MJXc-Node-3977" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-3978" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-3979" class="mjx-msqrt"><span class="mjx-box" style="padding-top: 0.045em;"><span class="mjx-surd"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.519em; padding-bottom: 0.519em;">√</span></span><span class="mjx-box" style="padding-top: 0.236em; border-top: 1px solid;"><span id="MJXc-Node-3980" class="mjx-mrow"><span id="MJXc-Node-3981" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span></span><span id="MJXc-Node-3982" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span> time, and modular exponentiation, being a finite cyclic group, is vulnerable to these attacks. Fortunately, this is a square-root of an exponential, so an attacker using these algorithms against a 128-bit key would be about as fast as an attacker using the naive brute-force algorithm against a 64-bit key, which doesn’t seem to be too bad of a tradeoff.</p>
+
+  </div>
+   <a href="../posts/2015-08-22-attacks.html"><b>More...</b></a>
+   
+   <p>
+   <br>
+   <br>
+   <br>
+
+  </p><h1 class="preview-title">
     <a href="../posts/2015-07-02-suspend.html" style="background-image: none">Macbook-style Suspend on Linux</a>
   </h1> 
   <div class="preview-info">
@@ -265,39 +281,6 @@
 
   </div>
    <a href="../posts/2014-05-04-singer.html"><b>More...</b></a>
-   
-   <p>
-   <br>
-   <br>
-   <br>
-
-  </p><h1 class="preview-title">
-    <a href="../posts/2014-02-12-parfit.html" style="background-image: none">Parfit</a>
-  </h1> 
-  <div class="preview-info">
-  
-  <div><i>February 12, 2014</i></div>
-  </div>
-  <p>
-  </p><p>
-  
-  </p><div class="preview">
-     <h2 id="i.">I.</h2>
-<p>On page 534 of Volume 2 of <em>On What Matters</em>, Parfit writes<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
-<blockquote>
-<p>If our normative beliefs were mostly produced by evolutionary forces, we would expect that we would have beliefs that were reproductively advantageous, by making it likely that we would have more descendants.</p>
-</blockquote>
-<blockquote>
-<p>If we ask which normative beliefs would be most likely to have this effect, there are some obvious answers. We would believe that we have strong reasons to try to have as many surviving children as we can, as an end in itself, and not merely because having children would promote our own well-being. But most people do not believe that they have such reasons. When people have become able to use artificial birth control, most of them have chosen to have fewer children.</p>
-</blockquote>
-<blockquote>
-<p>We can similarly claim that, if our moral beliefs were mostly produced by evolutionary forces, we would expect people to believe that they have a duty to have and raise as many children as they can, and that deciding not to have children would be wrong. But this is not what people have believed. Those who decide to have no children have often been revered or admired. If our normative beliefs were selected to maximize the number of our descendents, and of other people who have our genes, these various facts would be hard to explain.</p>
-</blockquote>
-<h2 id="ii.">II.</h2>
-<p>I was rather disappointed with this argument.</p>
-
-  </div>
-   <a href="../posts/2014-02-12-parfit.html"><b>More...</b></a>
    
    <p>
    <br>
