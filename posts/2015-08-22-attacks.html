@@ -1,142 +1,86 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="wf-loading"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Attacking Diffie-Hellman</title>
-    <!--
-     <script type="text/x-mathjax-config">
-            MathJax.Hub.Config({
-                displayAlign: "left",
-                showProcessingMessages: false,
-                showMathMenu: true,
-                messageStyle: "none",
-                TeX: { TagSide: "left", equationNumbers: { autoNumber: "AMS" } }
-            });
-        </script>
-        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-        </script>
-        -->
-<script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
-<script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
-   <link rel="stylesheet" type="text/css" href="../css/tufte.css"><style type="text/css">.tk-minion-pro-caption{font-family:"minion-pro-caption",sans-serif;}.tk-minion-pro-display{font-family:"minion-pro-display",serif;}</style><link rel="stylesheet" href="https://use.typekit.net/c/855fba/1w;minion-pro-caption,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,bzc:W:i4,bzb:W:n4,bzj:W:n7;minion-pro-display,7ceb210e49ade74e23101e10f006f110a0b6588c7c57777a6e3d98a38b749696,c0F:W:i4,c0J:W:n4,c0C:W:n7/k" media="all">
+    <script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
+    <script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
+     <link rel="stylesheet" type="text/css" href="../css/tufte.css">
   </head>
 
-  <body><style id="MathJax_CHTML_styles">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
-.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
-.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
-.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
-.mjx-math * {display: inline-block; text-align: left}
-.mjx-numerator {display: block; text-align: center}
-.mjx-denominator {display: block; text-align: center}
-.MJXc-stacked {height: 0; position: relative}
-.MJXc-stacked > * {position: absolute}
-.MJXc-bevelled > * {display: inline-block}
-.mjx-stack {display: inline-block}
-.mjx-op {display: block}
-.mjx-under {display: table-cell}
-.mjx-over {display: block}
-.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
-.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
-.mjx-stack > .mjx-sup {display: block}
-.mjx-stack > .mjx-sub {display: block}
-.mjx-prestack > .mjx-presup {display: block}
-.mjx-prestack > .mjx-presub {display: block}
-.mjx-delim-h > .mjx-char {display: inline-block}
-.mjx-surd {vertical-align: top}
-.mjx-mphantom * {visibility: hidden}
-.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
-.mjx-annotation-xml {line-height: normal}
-.mjx-menclose > svg {fill: none; stroke: currentColor}
-.mjx-mtr {display: table-row}
-.mjx-mlabeledtr {display: table-row}
-.mjx-mtd {display: table-cell; text-align: center}
-.mjx-label {display: block}
-.mjx-box {display: inline-block}
-.mjx-block {display: block}
-.mjx-span {display: span}
-.mjx-char {display: block; white-space: pre}
-.mjx-itable {display: inline-table}
-.mjx-row {display: table-row}
-.mjx-cell {display: table-cell}
-.mjx-table {display: table; width: 100%}
-.mjx-line {display: block; height: 0}
-.mjx-strut {width: 0; padding-top: 1em}
-.mjx-vsize {width: 0}
-.MJXc-space1 {margin-left: .167em}
-.MJXc-space2 {margin-left: .222em}
-.MJXc-space3 {margin-left: .278em}
-.mjx-ex-box-test {position: absolute; width: 1px; height: 60ex}
-.MJXc-TeX-unknown-R {font-family: monospace; font-style: normal; font-weight: normal}
-.MJXc-TeX-unknown-I {font-family: monospace; font-style: italic; font-weight: normal}
-.MJXc-TeX-unknown-B {font-family: monospace; font-style: normal; font-weight: bold}
-.MJXc-TeX-unknown-BI {font-family: monospace; font-style: italic; font-weight: bold}
-.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
-.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
-.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
-.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
-.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
-.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
-.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
-.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
-.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
-.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
-.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
-.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
-.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
-.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
-.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
-.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
-.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
-.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
-.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
-@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
-@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
-@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
-@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
-@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
-@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
-@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
-@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
-@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
-@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
-@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
-@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
-@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
-@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
-@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
-@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
-@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
-@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
-@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
-@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
-@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
-@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
-@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
-@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
-@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
-@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
-@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
-@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
-@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdn.mathjax.org/mathjax/latest/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
-</style>
-    <main role="main">
+  <body><style type="text/css">
+                            .mjpage .MJX-monospace {
+                            font-family: monospace
+                            }
+
+                            .mjpage .MJX-sans-serif {
+                            font-family: sans-serif
+                            }
+
+                            .mjpage {
+                            display: inline;
+                            font-style: normal;
+                            font-weight: normal;
+                            line-height: normal;
+                            font-size: 100%;
+                            font-size-adjust: none;
+                            text-indent: 0;
+                            text-align: left;
+                            text-transform: none;
+                            letter-spacing: normal;
+                            word-spacing: normal;
+                            word-wrap: normal;
+                            white-space: nowrap;
+                            float: none;
+                            direction: ltr;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            border: 0;
+                            padding: 0;
+                            margin: 0
+                            }
+
+                            .mjpage * {
+                            transition: none;
+                            -webkit-transition: none;
+                            -moz-transition: none;
+                            -ms-transition: none;
+                            -o-transition: none
+                            }
+
+                            .mjx-svg-href {
+                            fill: blue;
+                            stroke: blue
+                            }
+
+                            .MathJax_SVG_LineBox {
+                            display: table!important
+                            }
+
+                            .MathJax_SVG_LineBox span {
+                            display: table-cell!important;
+                            width: 10000em!important;
+                            min-width: 0;
+                            max-width: none;
+                            padding: 0;
+                            border: 0;
+                            margin: 0
+                            }
+
+                            .mjpage__block {
+                            text-align: center;
+                            margin: 1em 0em;
+                            position: relative;
+                            display: block!important;
+                            text-indent: 0;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            width: 100%
+                            }</style><main role="main">
     <article class="row article post" role="article">
       <div class="cell">
         <header class="row">
@@ -155,19 +99,241 @@
 </div>
 <p>
 
-</p><p>Part I of this series established the conceptual framework for Diffie-Hellman, so now we can turn to more pragmatic matters: attacks on Diffie-Hellman. Naively, the only way to calculate <span id="MathJax-Element-1-Frame" class="mjx-chtml"><span id="MJXc-Node-489" class="mjx-math" role="math"><span id="MJXc-Node-490" class="mjx-mrow"><span id="MJXc-Node-491" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span></span> where <span id="MathJax-Element-2-Frame" class="mjx-chtml"><span id="MJXc-Node-492" class="mjx-math" role="math"><span id="MJXc-Node-493" class="mjx-mrow"><span id="MJXc-Node-494" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-495" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-496" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span><span id="MJXc-Node-497" class="mjx-TeXmathchoice"><span id="MJXc-Node-498" class="mjx-mspace" style="width: 0.444em; height: 0px;"></span></span><span id="MJXc-Node-499" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-500" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-501" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-502" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-503" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-504" class="mjx-mo MJXc-space3"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.077em; padding-bottom: 0.298em;">=</span></span><span id="MJXc-Node-505" class="mjx-mi MJXc-space3"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">m</span></span></span></span></span> is to calculate <span class="math display"><span class="mjx-chtml MJXc-display"><span id="MathJax-Element-3-Frame" class="mjx-chtml" style="width: 100%; min-width: 24.296em;"><span id="MJXc-Node-506" class="mjx-math" style="width: 100%;" role="math"><span id="MJXc-Node-507" class="mjx-mrow" style="width: 100%;"><span class="mjx-stack" style="width: 100%; vertical-align: 0;"><span class="mjx-block" style="text-align: center;"><span class="mjx-box"><span id="MJXc-Node-508" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-509" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-510" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">1</span></span></span></span><span id="MJXc-Node-511" class="mjx-TeXmathchoice"><span id="MJXc-Node-512" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-513" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-514" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-515" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-516" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-517" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-518" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-519" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-520" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-521" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">2</span></span></span></span><span id="MJXc-Node-522" class="mjx-TeXmathchoice"><span id="MJXc-Node-523" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-524" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-525" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-526" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-527" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-528" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-529" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-530" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-531" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-532" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">3</span></span></span></span><span id="MJXc-Node-533" class="mjx-TeXmathchoice"><span id="MJXc-Node-534" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-535" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-536" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-537" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-538" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-539" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span><span id="MJXc-Node-540" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-541" class="mjx-mo MJXc-space1"><span class="mjx-char MJXc-TeX-main-R" style="margin-top: -0.144em; padding-bottom: 0.372em;">…</span></span><span id="MJXc-Node-542" class="mjx-mspace" style="width: 0px; height: 0px;"></span><span id="MJXc-Node-543" class="mjx-msubsup MJXc-space1"><span class="mjx-base"><span id="MJXc-Node-544" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-545" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span></span><span id="MJXc-Node-546" class="mjx-TeXmathchoice"><span id="MJXc-Node-547" class="mjx-mspace" style="width: 1em; height: 0px;"></span></span><span id="MJXc-Node-548" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-549" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">mod</span></span><span id="MJXc-Node-550" class="mjx-mspace" style="width: 0.333em; height: 0px;"></span><span id="MJXc-Node-551" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-552" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span></span></span></span></span></span> until we hit a match. The worst case of this algorithm is <span id="MathJax-Element-4-Frame" class="mjx-chtml"><span id="MJXc-Node-553" class="mjx-math" role="math"><span id="MJXc-Node-554" class="mjx-mrow"><span id="MJXc-Node-555" class="mjx-texatom"><span id="MJXc-Node-556" class="mjx-mrow"><span id="MJXc-Node-557" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-558" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-559" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span><span id="MJXc-Node-560" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span>, which means that the time required to brute-force a shared key grows exponentially with the bitlength of the key.</p>
-<p>However, there’s a number of algorithms<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> that allow us to compute the discrete log of any finite cyclic group in about <span id="MathJax-Element-5-Frame" class="mjx-chtml"><span id="MJXc-Node-561" class="mjx-math" role="math"><span id="MJXc-Node-562" class="mjx-mrow"><span id="MJXc-Node-563" class="mjx-texatom"><span id="MJXc-Node-564" class="mjx-mrow"><span id="MJXc-Node-565" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-566" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-567" class="mjx-msqrt"><span class="mjx-box" style="padding-top: 0.045em;"><span class="mjx-surd"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.519em; padding-bottom: 0.519em;">√</span></span><span class="mjx-box" style="padding-top: 0.236em; border-top: 1px solid;"><span id="MJXc-Node-568" class="mjx-mrow"><span id="MJXc-Node-569" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span></span><span id="MJXc-Node-570" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span> time, and modular exponentiation, being a finite cyclic group, is vulnerable to these attacks. Fortunately, this is a square-root of an exponential, so an attacker using these algorithms against a 128-bit key would be about as fast as an attacker using the naive brute-force algorithm against a 64-bit key, which doesn’t seem to be too bad of a tradeoff.</p>
+</p><p>Part I of this series established the conceptual framework for Diffie-Hellman, so now we can turn to more pragmatic matters: attacks on Diffie-Hellman. Naively, the only way to calculate <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.33ex" height="1.676ex" style="vertical-align: -0.338ex;" viewBox="0 -576.1 572.5 721.6" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">x</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMATHI-78" x="0" y="0"></use>
+</g>
+</svg></span> where <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="17.33ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 7461.3 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-2-Title">
+<title id="MathJax-SVG-2-Title">a^x\pmod{n} = m</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E2-MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path>
+<path stroke-width="1" id="E2-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-6D" d="M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q351 442 364 440T387 434T406 426T421 417T432 406T441 395T448 384T452 374T455 366L457 361L460 365Q463 369 466 373T475 384T488 397T503 410T523 422T546 432T572 439T603 442Q729 442 740 329Q741 322 741 190V104Q741 66 743 59T754 49Q775 46 803 46H819V0H811L788 1Q764 2 737 2T699 3Q596 3 587 0H579V46H595Q656 46 656 62Q657 64 657 200Q656 335 655 343Q649 371 635 385T611 402T585 404Q540 404 506 370Q479 343 472 315T464 232V168V108Q464 78 465 68T468 55T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-64" d="M376 495Q376 511 376 535T377 568Q377 613 367 624T316 637H298V660Q298 683 300 683L310 684Q320 685 339 686T376 688Q393 689 413 690T443 693T454 694H457V390Q457 84 458 81Q461 61 472 55T517 46H535V0Q533 0 459 -5T380 -11H373V44L365 37Q307 -11 235 -11Q158 -11 96 50T34 215Q34 315 97 378T244 442Q319 442 376 393V495ZM373 342Q328 405 260 405Q211 405 173 369Q146 341 139 305T131 211Q131 155 138 120T173 59Q203 26 251 26Q322 26 373 103V342Z"></path>
+<path stroke-width="1" id="E2-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E2-MJMATHI-6D" d="M21 287Q22 293 24 303T36 341T56 388T88 425T132 442T175 435T205 417T221 395T229 376L231 369Q231 367 232 367L243 378Q303 442 384 442Q401 442 415 440T441 433T460 423T475 411T485 398T493 385T497 373T500 364T502 357L510 367Q573 442 659 442Q713 442 746 415T780 336Q780 285 742 178T704 50Q705 36 709 31T724 26Q752 26 776 56T815 138Q818 149 821 151T837 153Q857 153 857 145Q857 144 853 130Q845 101 831 73T785 17T716 -10Q669 -10 648 17T627 73Q627 92 663 193T700 345Q700 404 656 404H651Q565 404 506 303L499 291L466 157Q433 26 428 16Q415 -11 385 -11Q372 -11 364 -4T353 8T350 18Q350 29 384 161L420 307Q423 322 423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 181Q151 335 151 342Q154 357 154 369Q154 405 129 405Q107 405 92 377T69 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E2-MJMATHI-61" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E2-MJMATHI-78" x="748" y="513"></use>
+ <use xlink:href="#E2-MJMAIN-28" x="1478" y="0"></use>
+<g transform="translate(1868,0)">
+ <use xlink:href="#E2-MJMAIN-6D"></use>
+ <use xlink:href="#E2-MJMAIN-6F" x="833" y="0"></use>
+ <use xlink:href="#E2-MJMAIN-64" x="1334" y="0"></use>
+</g>
+ <use xlink:href="#E2-MJMATHI-6E" x="4258" y="0"></use>
+ <use xlink:href="#E2-MJMAIN-29" x="4859" y="0"></use>
+ <use xlink:href="#E2-MJMAIN-3D" x="5526" y="0"></use>
+ <use xlink:href="#E2-MJMATHI-6D" x="6582" y="0"></use>
+</g>
+</svg></span> is to calculate <span class="math display"><span class="mjpage mjpage__block"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="100ex" height="16.009ex" style="vertical-align: -13.671ex; max-width: 60000px;" viewBox="0 -1006.6 43055.4 6892.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-3-Title">
+<title id="MathJax-SVG-3-Title">a^1\pmod{n}\\a^2\pmod{n}\\a^3\pmod{n}\\\ldots\\a^x\pmod{n}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E3-MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-6D" d="M41 46H55Q94 46 102 60V68Q102 77 102 91T102 122T103 161T103 203Q103 234 103 269T102 328V351Q99 370 88 376T43 385H25V408Q25 431 27 431L37 432Q47 433 65 434T102 436Q119 437 138 438T167 441T178 442H181V402Q181 364 182 364T187 369T199 384T218 402T247 421T285 437Q305 442 336 442Q351 442 364 440T387 434T406 426T421 417T432 406T441 395T448 384T452 374T455 366L457 361L460 365Q463 369 466 373T475 384T488 397T503 410T523 422T546 432T572 439T603 442Q729 442 740 329Q741 322 741 190V104Q741 66 743 59T754 49Q775 46 803 46H819V0H811L788 1Q764 2 737 2T699 3Q596 3 587 0H579V46H595Q656 46 656 62Q657 64 657 200Q656 335 655 343Q649 371 635 385T611 402T585 404Q540 404 506 370Q479 343 472 315T464 232V168V108Q464 78 465 68T468 55T477 49Q498 46 526 46H542V0H534L510 1Q487 2 460 2T422 3Q319 3 310 0H302V46H318Q379 46 379 62Q380 64 380 200Q379 335 378 343Q372 371 358 385T334 402T308 404Q263 404 229 370Q202 343 195 315T187 232V168V108Q187 78 188 68T191 55T200 49Q221 46 249 46H265V0H257L234 1Q210 2 183 2T145 3Q42 3 33 0H25V46H41Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-6F" d="M28 214Q28 309 93 378T250 448Q340 448 405 380T471 215Q471 120 407 55T250 -10Q153 -10 91 57T28 214ZM250 30Q372 30 372 193V225V250Q372 272 371 288T364 326T348 362T317 390T268 410Q263 411 252 411Q222 411 195 399Q152 377 139 338T126 246V226Q126 130 145 91Q177 30 250 30Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-64" d="M376 495Q376 511 376 535T377 568Q377 613 367 624T316 637H298V660Q298 683 300 683L310 684Q320 685 339 686T376 688Q393 689 413 690T443 693T454 694H457V390Q457 84 458 81Q461 61 472 55T517 46H535V0Q533 0 459 -5T380 -11H373V44L365 37Q307 -11 235 -11Q158 -11 96 50T34 215Q34 315 97 378T244 442Q319 442 376 393V495ZM373 342Q328 405 260 405Q211 405 173 369Q146 341 139 305T131 211Q131 155 138 120T173 59Q203 26 251 26Q322 26 373 103V342Z"></path>
+<path stroke-width="1" id="E3-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-2026" d="M78 60Q78 84 95 102T138 120Q162 120 180 104T199 61Q199 36 182 18T139 0T96 17T78 60ZM525 60Q525 84 542 102T585 120Q609 120 627 104T646 61Q646 36 629 18T586 0T543 17T525 60ZM972 60Q972 84 989 102T1032 120Q1056 120 1074 104T1093 61Q1093 36 1076 18T1033 0T990 17T972 60Z"></path>
+<path stroke-width="1" id="E3-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+<g transform="translate(18650,0)">
+ <use xlink:href="#E3-MJMATHI-61" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E3-MJMAIN-31" x="748" y="583"></use>
+ <use xlink:href="#E3-MJMAIN-28" x="1983" y="0"></use>
+<g transform="translate(2372,0)">
+ <use xlink:href="#E3-MJMAIN-6D"></use>
+ <use xlink:href="#E3-MJMAIN-6F" x="833" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-64" x="1334" y="0"></use>
+</g>
+ <use xlink:href="#E3-MJMATHI-6E" x="4763" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-29" x="5363" y="0"></use>
+</g>
+<g transform="translate(18650,-1567)">
+ <use xlink:href="#E3-MJMATHI-61" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E3-MJMAIN-32" x="748" y="583"></use>
+ <use xlink:href="#E3-MJMAIN-28" x="1983" y="0"></use>
+<g transform="translate(2372,0)">
+ <use xlink:href="#E3-MJMAIN-6D"></use>
+ <use xlink:href="#E3-MJMAIN-6F" x="833" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-64" x="1334" y="0"></use>
+</g>
+ <use xlink:href="#E3-MJMATHI-6E" x="4763" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-29" x="5363" y="0"></use>
+</g>
+<g transform="translate(18650,-3132)">
+ <use xlink:href="#E3-MJMATHI-61" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E3-MJMAIN-33" x="748" y="583"></use>
+ <use xlink:href="#E3-MJMAIN-28" x="1983" y="0"></use>
+<g transform="translate(2372,0)">
+ <use xlink:href="#E3-MJMAIN-6D"></use>
+ <use xlink:href="#E3-MJMAIN-6F" x="833" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-64" x="1334" y="0"></use>
+</g>
+ <use xlink:href="#E3-MJMATHI-6E" x="4763" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-29" x="5363" y="0"></use>
+</g>
+<g transform="translate(20941,-4332)">
+ <use xlink:href="#E3-MJMAIN-2026" x="0" y="0"></use>
+</g>
+<g transform="translate(18625,-5532)">
+ <use xlink:href="#E3-MJMATHI-61" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E3-MJMATHI-78" x="748" y="583"></use>
+ <use xlink:href="#E3-MJMAIN-28" x="2034" y="0"></use>
+<g transform="translate(2423,0)">
+ <use xlink:href="#E3-MJMAIN-6D"></use>
+ <use xlink:href="#E3-MJMAIN-6F" x="833" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-64" x="1334" y="0"></use>
+</g>
+ <use xlink:href="#E3-MJMATHI-6E" x="4814" y="0"></use>
+ <use xlink:href="#E3-MJMAIN-29" x="5414" y="0"></use>
+</g>
+</g>
+</svg></span></span> until we hit a match. The worst case of this algorithm is <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="5.054ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 2176 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-4-Title">
+<title id="MathJax-SVG-4-Title">\mathcal{O}(n)</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E4-MJCAL-4F" d="M308 428Q289 428 289 438Q289 457 318 508T378 593Q417 638 475 671T599 705Q688 705 732 643T777 483Q777 380 733 285T620 123T464 18T293 -22Q188 -22 123 51T58 245Q58 327 87 403T159 533T249 626T333 685T388 705Q404 705 404 693Q404 674 363 649Q333 632 304 606T239 537T181 429T158 290Q158 179 214 114T364 48Q489 48 583 165T677 438Q677 473 670 505T648 568T601 617T528 636Q518 636 513 635Q486 629 460 600T419 544T392 490Q383 470 372 459Q341 430 308 428Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E4-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E4-MJCAL-4F" x="0" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-28" x="796" y="0"></use>
+ <use xlink:href="#E4-MJMATHI-6E" x="1186" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-29" x="1786" y="0"></use>
+</g>
+</svg></span>, which means that the time required to brute-force a shared key grows exponentially with the bitlength of the key.</p>
+<p>However, there’s a number of algorithms<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> that allow us to compute the discrete log of any finite cyclic group in about <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="6.99ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 3009.5 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-5-Title">
+<title id="MathJax-SVG-5-Title">\mathcal{O}(\sqrt{n})</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E5-MJCAL-4F" d="M308 428Q289 428 289 438Q289 457 318 508T378 593Q417 638 475 671T599 705Q688 705 732 643T777 483Q777 380 733 285T620 123T464 18T293 -22Q188 -22 123 51T58 245Q58 327 87 403T159 533T249 626T333 685T388 705Q404 705 404 693Q404 674 363 649Q333 632 304 606T239 537T181 429T158 290Q158 179 214 114T364 48Q489 48 583 165T677 438Q677 473 670 505T648 568T601 617T528 636Q518 636 513 635Q486 629 460 600T419 544T392 490Q383 470 372 459Q341 430 308 428Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E5-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-221A" d="M95 178Q89 178 81 186T72 200T103 230T169 280T207 309Q209 311 212 311H213Q219 311 227 294T281 177Q300 134 312 108L397 -77Q398 -77 501 136T707 565T814 786Q820 800 834 800Q841 800 846 794T853 782V776L620 293L385 -193Q381 -200 366 -200Q357 -200 354 -197Q352 -195 256 15L160 225L144 214Q129 202 113 190T95 178Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E5-MJCAL-4F" x="0" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-28" x="796" y="0"></use>
+<g transform="translate(1186,0)">
+ <use xlink:href="#E5-MJMAIN-221A" x="0" y="-78"></use>
+<rect stroke="none" width="600" height="60" x="833" y="663"></rect>
+ <use xlink:href="#E5-MJMATHI-6E" x="833" y="0"></use>
+</g>
+ <use xlink:href="#E5-MJMAIN-29" x="2620" y="0"></use>
+</g>
+</svg></span> time, and modular exponentiation, being a finite cyclic group, is vulnerable to these attacks. Fortunately, this is a square-root of an exponential, so an attacker using these algorithms against a 128-bit key would be about as fast as an attacker using the naive brute-force algorithm against a 64-bit key, which doesn’t seem to be too bad of a tradeoff.</p>
 <!--more-->
-<p>However, there are also index-calculus attacks that offer performance even greater than the aforementioned algorithms, requiring key lengths of 1000-2000 bits in order to slow an attacker armed with this algorithm to the speed of a naive brute-forcer attacking a 64-bit key. And that’s why we see <span id="MathJax-Element-6-Frame" class="mjx-chtml"><span id="MJXc-Node-571" class="mjx-math" role="math"><span id="MJXc-Node-572" class="mjx-mrow"><span id="MJXc-Node-573" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-574" class="mjx-texatom"><span id="MJXc-Node-575" class="mjx-mrow"><span id="MJXc-Node-576" class="mjx-mi"><span class="mjx-char MJXc-TeX-ams-R" style="padding-top: 0.446em; padding-bottom: 0.298em;">Z</span></span></span></span></span><span class="mjx-stack" style="vertical-align: -0.247em;"><span class="mjx-sup" style="font-size: 70.7%; padding-bottom: 0.498em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-578" class="mjx-mo" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.151em; padding-bottom: 0.298em;">∗</span></span></span><span class="mjx-sub" style="font-size: 70.7%; padding-right: 0.071em;"><span id="MJXc-Node-577" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.446em;">p</span></span></span></span></span></span></span></span> Diffie-Hellman implemented in the wild with key lengths in the 1000-2000 bit range.</p>
-<p>Fortunately, <span id="MathJax-Element-7-Frame" class="mjx-chtml"><span id="MJXc-Node-579" class="mjx-math" role="math"><span id="MJXc-Node-580" class="mjx-mrow"><span id="MJXc-Node-581" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-582" class="mjx-texatom"><span id="MJXc-Node-583" class="mjx-mrow"><span id="MJXc-Node-584" class="mjx-mi"><span class="mjx-char MJXc-TeX-ams-R" style="padding-top: 0.446em; padding-bottom: 0.298em;">Z</span></span></span></span></span><span class="mjx-stack" style="vertical-align: -0.247em;"><span class="mjx-sup" style="font-size: 70.7%; padding-bottom: 0.498em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-586" class="mjx-mo" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.151em; padding-bottom: 0.298em;">∗</span></span></span><span class="mjx-sub" style="font-size: 70.7%; padding-right: 0.071em;"><span id="MJXc-Node-585" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.446em;">p</span></span></span></span></span></span></span></span> is not the only finite cyclic group, and as long as we have a finite cyclic group, we can implement Diffie-Hellman with it. Of course, just being a finite cyclic group is mere table stakes for an aspiring Diffie-Hellman cylic group. The real superstar groups, like elliptic curves, have additional properties that make them exempt from certain attacks that affect other groups. I won’t say too much more about elliptic curves, because that would take a whole new post, but understanding the bare mechanics of how they work is fairly straightforward. Basically, we take an elliptic curve defined by:</p>
+<p>However, there are also index-calculus attacks that offer performance even greater than the aforementioned algorithms, requiring key lengths of 1000-2000 bits in order to slow an attacker armed with this algorithm to the speed of a naive brute-forcer attacking a 64-bit key. And that’s why we see <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.609ex" height="3.176ex" style="vertical-align: -1.171ex;" viewBox="0 -863.1 1123.5 1367.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-6-Title">
+<title id="MathJax-SVG-6-Title">\mathbb{Z}_p^*</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E6-MJAMS-5A" d="M39 -1Q29 9 29 12Q29 23 60 77T219 337L410 648H364Q261 648 210 628Q168 612 142 588T109 545T97 509T88 490Q85 489 80 489Q72 489 61 503L70 588Q72 607 75 628T79 662T81 675Q84 677 88 681Q90 683 341 683H592Q604 673 604 666Q604 662 412 348L221 37Q221 35 301 35Q406 35 446 48Q504 68 543 111T597 212Q602 239 617 239Q624 239 629 234T635 223Q635 215 621 113T604 8L597 1Q595 -1 317 -1H39ZM148 637L166 648H112V632Q111 629 110 622T108 612Q108 608 110 608T116 612T129 623T148 637ZM552 646Q552 648 504 648Q452 648 450 643Q448 639 266 343T77 37Q77 35 128 35H179L366 339L552 646ZM572 35Q581 89 581 97L561 77Q542 59 526 48L508 37L539 35H572Z"></path>
+<path stroke-width="1" id="E6-MJMAIN-2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path>
+<path stroke-width="1" id="E6-MJMATHI-70" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E6-MJAMS-5A" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E6-MJMAIN-2217" x="943" y="581"></use>
+ <use transform="scale(0.707)" xlink:href="#E6-MJMATHI-70" x="943" y="-350"></use>
+</g>
+</svg></span> Diffie-Hellman implemented in the wild with key lengths in the 1000-2000 bit range.</p>
+<p>Fortunately, <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.609ex" height="3.176ex" style="vertical-align: -1.171ex;" viewBox="0 -863.1 1123.5 1367.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-7-Title">
+<title id="MathJax-SVG-7-Title">\mathbb{Z}_p^*</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E7-MJAMS-5A" d="M39 -1Q29 9 29 12Q29 23 60 77T219 337L410 648H364Q261 648 210 628Q168 612 142 588T109 545T97 509T88 490Q85 489 80 489Q72 489 61 503L70 588Q72 607 75 628T79 662T81 675Q84 677 88 681Q90 683 341 683H592Q604 673 604 666Q604 662 412 348L221 37Q221 35 301 35Q406 35 446 48Q504 68 543 111T597 212Q602 239 617 239Q624 239 629 234T635 223Q635 215 621 113T604 8L597 1Q595 -1 317 -1H39ZM148 637L166 648H112V632Q111 629 110 622T108 612Q108 608 110 608T116 612T129 623T148 637ZM552 646Q552 648 504 648Q452 648 450 643Q448 639 266 343T77 37Q77 35 128 35H179L366 339L552 646ZM572 35Q581 89 581 97L561 77Q542 59 526 48L508 37L539 35H572Z"></path>
+<path stroke-width="1" id="E7-MJMAIN-2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path>
+<path stroke-width="1" id="E7-MJMATHI-70" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E7-MJAMS-5A" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E7-MJMAIN-2217" x="943" y="581"></use>
+ <use transform="scale(0.707)" xlink:href="#E7-MJMATHI-70" x="943" y="-350"></use>
+</g>
+</svg></span> is not the only finite cyclic group, and as long as we have a finite cyclic group, we can implement Diffie-Hellman with it. Of course, just being a finite cyclic group is mere table stakes for an aspiring Diffie-Hellman cylic group. The real superstar groups, like elliptic curves, have additional properties that make them exempt from certain attacks that affect other groups. I won’t say too much more about elliptic curves, because that would take a whole new post, but understanding the bare mechanics of how they work is fairly straightforward. Basically, we take an elliptic curve defined by:</p>
 <blockquote>
-<p><span class="math display"><span class="mjx-chtml MJXc-display" style="text-align: center;"><span id="MathJax-Element-8-Frame" class="mjx-chtml"><span id="MJXc-Node-587" class="mjx-math" role="math"><span id="MJXc-Node-588" class="mjx-mrow"><span id="MJXc-Node-589" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.006em;"><span id="MJXc-Node-590" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.519em; padding-right: 0.006em;">y</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0.082em; padding-right: 0.071em;"><span id="MJXc-Node-591" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">2</span></span></span></span><span id="MJXc-Node-592" class="mjx-mo MJXc-space3"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.077em; padding-bottom: 0.298em;">=</span></span><span id="MJXc-Node-593" class="mjx-msubsup MJXc-space3"><span class="mjx-base"><span id="MJXc-Node-594" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.584em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-595" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.372em; padding-bottom: 0.372em;">3</span></span></span></span><span id="MJXc-Node-596" class="mjx-mo MJXc-space2"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.298em; padding-bottom: 0.446em;">+</span></span><span id="MJXc-Node-597" class="mjx-mi MJXc-space2"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">a</span></span><span id="MJXc-Node-598" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">x</span></span><span id="MJXc-Node-599" class="mjx-mo MJXc-space2"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.298em; padding-bottom: 0.446em;">+</span></span><span id="MJXc-Node-600" class="mjx-mi MJXc-space2"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.446em; padding-bottom: 0.298em;">b</span></span></span></span></span></span></span></p>
+<p><span class="math display"><span class="mjpage mjpage__block"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="16.935ex" height="3.009ex" style="vertical-align: -0.671ex;" viewBox="0 -1006.6 7291.4 1295.7" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-8-Title">
+<title id="MathJax-SVG-8-Title">y^2 = x^3 + ax + b</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E8-MJMATHI-79" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E8-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E8-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E8-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
+<path stroke-width="1" id="E8-MJMAIN-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
+<path stroke-width="1" id="E8-MJMAIN-2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path>
+<path stroke-width="1" id="E8-MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path>
+<path stroke-width="1" id="E8-MJMATHI-62" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E8-MJMATHI-79" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E8-MJMAIN-32" x="706" y="583"></use>
+ <use xlink:href="#E8-MJMAIN-3D" x="1231" y="0"></use>
+<g transform="translate(2287,0)">
+ <use xlink:href="#E8-MJMATHI-78" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E8-MJMAIN-33" x="809" y="583"></use>
+</g>
+ <use xlink:href="#E8-MJMAIN-2B" x="3536" y="0"></use>
+ <use xlink:href="#E8-MJMATHI-61" x="4536" y="0"></use>
+ <use xlink:href="#E8-MJMATHI-78" x="5066" y="0"></use>
+ <use xlink:href="#E8-MJMAIN-2B" x="5861" y="0"></use>
+ <use xlink:href="#E8-MJMATHI-62" x="6861" y="0"></use>
+</g>
+</svg></span></span></p>
 </blockquote>
-<p>and define an operation over points on this curve to wrangle finite cyclic group behaviour out of it. Of course, if it behaves like a finite cyclic group, it <em>is</em> a finite cylic group, and we can use this group in Diffie-Hellman. The resulting group is resistant to the aforementioned index-calculus attacks, so the only known attacks are the <span id="MathJax-Element-9-Frame" class="mjx-chtml"><span id="MJXc-Node-601" class="mjx-math" role="math"><span id="MJXc-Node-602" class="mjx-mrow"><span id="MJXc-Node-603" class="mjx-texatom"><span id="MJXc-Node-604" class="mjx-mrow"><span id="MJXc-Node-605" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-606" class="mjx-msqrt"><span class="mjx-box" style="padding-top: 0.045em;"><span class="mjx-surd"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.519em; padding-bottom: 0.519em;">√</span></span><span class="mjx-box" style="padding-top: 0.236em; border-top: 1px solid;"><span id="MJXc-Node-607" class="mjx-mrow"><span id="MJXc-Node-608" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span></span></span></span></span> ones, which means we can select key sizes that are an order of magnitude smaller than the ones we used with discrete log Diffie-Hellman, but still maintain comparable resistance to attack.</p>
+<p>and define an operation over points on this curve to wrangle finite cyclic group behaviour out of it. Of course, if it behaves like a finite cyclic group, it <em>is</em> a finite cylic group, and we can use this group in Diffie-Hellman. The resulting group is resistant to the aforementioned index-calculus attacks, so the only known attacks are the <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="5.181ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 2230.5 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-9-Title">
+<title id="MathJax-SVG-9-Title">\cal{O}\sqrt{n}</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E9-MJCAL-4F" d="M308 428Q289 428 289 438Q289 457 318 508T378 593Q417 638 475 671T599 705Q688 705 732 643T777 483Q777 380 733 285T620 123T464 18T293 -22Q188 -22 123 51T58 245Q58 327 87 403T159 533T249 626T333 685T388 705Q404 705 404 693Q404 674 363 649Q333 632 304 606T239 537T181 429T158 290Q158 179 214 114T364 48Q489 48 583 165T677 438Q677 473 670 505T648 568T601 617T528 636Q518 636 513 635Q486 629 460 600T419 544T392 490Q383 470 372 459Q341 430 308 428Z"></path>
+<path stroke-width="1" id="E9-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E9-MJMAIN-221A" d="M95 178Q89 178 81 186T72 200T103 230T169 280T207 309Q209 311 212 311H213Q219 311 227 294T281 177Q300 134 312 108L397 -77Q398 -77 501 136T707 565T814 786Q820 800 834 800Q841 800 846 794T853 782V776L620 293L385 -193Q381 -200 366 -200Q357 -200 354 -197Q352 -195 256 15L160 225L144 214Q129 202 113 190T95 178Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E9-MJCAL-4F" x="0" y="0"></use>
+<g transform="translate(796,0)">
+ <use xlink:href="#E9-MJMAIN-221A" x="0" y="-78"></use>
+<rect stroke="none" width="600" height="60" x="833" y="663"></rect>
+ <use xlink:href="#E9-MJMATHI-6E" x="833" y="0"></use>
+</g>
+</g>
+</svg></span> ones, which means we can select key sizes that are an order of magnitude smaller than the ones we used with discrete log Diffie-Hellman, but still maintain comparable resistance to attack.</p>
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p>The giant-step, baby-step algorithm and Pollard’s rho algorithm can calculate the discrete log of any finite cyclic group in about <span id="MathJax-Element-10-Frame" class="mjx-chtml"><span id="MJXc-Node-609" class="mjx-math" role="math"><span id="MJXc-Node-610" class="mjx-mrow"><span id="MJXc-Node-611" class="mjx-texatom"><span id="MJXc-Node-612" class="mjx-mrow"><span id="MJXc-Node-613" class="mjx-mi"><span class="mjx-char MJXc-TeX-cal-R" style="padding-top: 0.446em; padding-bottom: 0.372em;">O</span></span></span></span><span id="MJXc-Node-614" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">(</span></span><span id="MJXc-Node-615" class="mjx-msqrt"><span class="mjx-box" style="padding-top: 0.045em;"><span class="mjx-surd"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.519em; padding-bottom: 0.519em;">√</span></span><span class="mjx-box" style="padding-top: 0.236em; border-top: 1px solid;"><span id="MJXc-Node-616" class="mjx-mrow"><span id="MJXc-Node-617" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.225em; padding-bottom: 0.298em;">n</span></span></span></span></span></span><span id="MJXc-Node-618" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.446em; padding-bottom: 0.593em;">)</span></span></span></span></span> time. They are fairly simple algorithms, and I might write another article analysing them in detail.<a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>The giant-step, baby-step algorithm and Pollard’s rho algorithm can calculate the discrete log of any finite cyclic group in about <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="6.99ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 3009.5 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-10-Title">
+<title id="MathJax-SVG-10-Title">\mathcal{O}(\sqrt{n})</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E10-MJCAL-4F" d="M308 428Q289 428 289 438Q289 457 318 508T378 593Q417 638 475 671T599 705Q688 705 732 643T777 483Q777 380 733 285T620 123T464 18T293 -22Q188 -22 123 51T58 245Q58 327 87 403T159 533T249 626T333 685T388 705Q404 705 404 693Q404 674 363 649Q333 632 304 606T239 537T181 429T158 290Q158 179 214 114T364 48Q489 48 583 165T677 438Q677 473 670 505T648 568T601 617T528 636Q518 636 513 635Q486 629 460 600T419 544T392 490Q383 470 372 459Q341 430 308 428Z"></path>
+<path stroke-width="1" id="E10-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path>
+<path stroke-width="1" id="E10-MJMATHI-6E" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path>
+<path stroke-width="1" id="E10-MJMAIN-221A" d="M95 178Q89 178 81 186T72 200T103 230T169 280T207 309Q209 311 212 311H213Q219 311 227 294T281 177Q300 134 312 108L397 -77Q398 -77 501 136T707 565T814 786Q820 800 834 800Q841 800 846 794T853 782V776L620 293L385 -193Q381 -200 366 -200Q357 -200 354 -197Q352 -195 256 15L160 225L144 214Q129 202 113 190T95 178Z"></path>
+<path stroke-width="1" id="E10-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E10-MJCAL-4F" x="0" y="0"></use>
+ <use xlink:href="#E10-MJMAIN-28" x="796" y="0"></use>
+<g transform="translate(1186,0)">
+ <use xlink:href="#E10-MJMAIN-221A" x="0" y="-78"></use>
+<rect stroke="none" width="600" height="60" x="833" y="663"></rect>
+ <use xlink:href="#E10-MJMATHI-6E" x="833" y="0"></use>
+</g>
+ <use xlink:href="#E10-MJMAIN-29" x="2620" y="0"></use>
+</g>
+</svg></span> time. They are fairly simple algorithms, and I might write another article analysing them in detail.<a href="#fnref1">↩</a></p></li>
 </ol>
 </div>
 

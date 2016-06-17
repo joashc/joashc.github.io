@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Free monads in 7 easy steps</title>
+    <script type="text/javascript" src="https://use.typekit.net/geg0pqq.js"></script>
+    <script type="text/javascript">try{Typekit.load({ async: true });}catch(e){}</script>
+     <link rel="stylesheet" type="text/css" href="../css/tufte.css">
+  </head>
+
+  <body><main role="main">
+    <article class="row article post" role="article">
+      <div class="cell">
+        <header class="row">
+          <div class="home">
+            <a href="../">Blog</a>
+            <a href="../archive.html">Archive</a>
+            <a href="../projects.html">Projects</a>
+          </div>
+        </header>
+          <h1 class="preview-title">Free monads in 7 easy steps</h1> 
+<div class="preview-info">
+
+  Part I of the series <i>Free monads</i>.
+
+<div><i>July 29, 2016</i></div>
+</div>
+<p>
+
+</p><p>In <a href="../posts/2016-08-02-free-monads.html">the next part</a> of this series, we’ll discuss free monads from a category theory perspective. This first installment will be decidedly more practical, focusing on how you actually <em>use</em> free monads in Haskell, and what advantages they bring. This means I’ll gloss over a lot of the mechanics of how free monads actually <em>work</em>, and make this more of a “get it done” kind of post.</p>
+<h2 id="the-finest-imperative-language">The finest imperative language?</h2>
+<p>Simon Peyton-Jones famously said that Haskell was the world’s finest imperative programming language. When I started writing Haskell, however, I literally tacked <code>-&gt; IO ()</code> onto the end of all my functions and went to town writing imperative code.</p>
+<p>Of course, not <em>all</em> the functions I wrote returned an <code>IO ()</code>, but because that was the only tool that I had to interact with the outside world, a great deal of my code- far more than necessary- simply lived inside the IO monad.</p>
+<p>Here’s a pretty representative example, from a program I wrote that implemented anonymized network chat<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">keyExchangeHandler ::</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">PeerData</span> <span class="ot">-&gt;</span> <span class="dt">MVar</span> <span class="dt">ServerState</span> <span class="ot">-&gt;</span> <span class="dt">IpAddress</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Handle</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+keyExchangeHandler p state ip portNumber handle <span class="fu">=</span> <span class="kw">case</span> p <span class="kw">of</span>
+  <span class="dt">Right</span> peerData <span class="ot">-&gt;</span> <span class="kw">do</span>
+    s <span class="ot">&lt;-</span> takeMVar state
+    <span class="kw">let</span> peer <span class="fu">=</span> <span class="dt">Participant</span> (publicKey peerData) (nonce peerData) ip portNumber
+    <span class="kw">let</span> newPs <span class="fu">=</span> peer<span class="fu">:</span>(peers s)
+    <span class="kw">if</span> length newPs <span class="fu">==</span> groupSize s
+       <span class="kw">then</span> forkIO <span class="fu">$</span> sendPeerList state
+       <span class="kw">else</span> forkIO <span class="fu">$</span> putStrLn <span class="st">"Waiting for peers"</span>
+    putMVar state s{ peers <span class="fu">=</span> newPs }
+  <span class="dt">Left</span> e <span class="ot">-&gt;</span> putStrLn <span class="fu">$</span> <span class="st">"Could not parse public key: "</span> <span class="fu">++</span> e</code></pre></div>
+<p>The semantics of the application logic are completely mixed up with implementation-level details, and having all these functions just return <code>IO ()</code> meant that I wasn’t exploiting a lot of the safety that the type system could provide. It was essentially Haskell-flavoured Java<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>! You can take a look at what the code looked like back then <a href="https://github.com/joashc/cryptodiner/blob/34774247f1b45a02c6a24f5ae30ab66867835701/network/main.hs">here</a>.</p>
+<p>Alright, so we don’t want a bunch of opaque <code>IO ()</code> functions, but wouldn’t refactoring to use the free monad be really painful?</p>
+<p>Not at all! Here’s how you use free monads, in just seven easy steps!</p>
+<!--more-->
+<h2 id="step-1-create-your-operations">Step 1: Create your operations</h2>
+<p>Free monads allow you to separate the semantics of your application from the details of its implementation in a very flexible way. They’re basically an easy way to create a DSL that specifies only the bare minimum to get monadic behaviour and do-notation.</p>
+<p>To start, you need to define the fundamental operations of your program. This is more of an art than a science, but there are a few guidelines:</p>
+<ul>
+<li>You want as little (ideally, none) implementation detail to spill over into your operations.</li>
+<li>If an operation can be composed of multiple, more basic operations, you should usually only create the most basic ones.</li>
+<li>You can make your operations polymorphic.</li>
+</ul>
+<p>To define your fundamental operations, you create a sum type that will serve as your operators. Here’s a simplified version of what I settled on for my chat program:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">DcNodeOperator</span> state error next <span class="fu">=</span>
+    <span class="dt">InitState</span> next
+  <span class="fu">|</span> <span class="dt">AwaitStateCondition</span> (state <span class="ot">-&gt;</span> <span class="dt">Bool</span>) (state <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">GetState</span> (state <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">GetUserInput</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">ModifyState</span> (state <span class="ot">-&gt;</span> state) next
+  <span class="fu">|</span> <span class="dt">DisplayMessage</span> <span class="dt">String</span> next
+  <span class="fu">|</span> <span class="dt">GetRandomInt</span> <span class="dt">Int</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">Throw</span> error next</code></pre></div>
+<p>A few comments:</p>
+<ul>
+<li>This is far from an ideal set of operations, but they used to be a lot worse!</li>
+<li><code>DcNodeOperator</code> is polymorphic over the state type and the error type. This meant that I could use the same set of operations to describe both my client and server applications.</li>
+<li><code>InitState</code> is a bit suspicious; it seems like an implementation detail rather than something that’s fundamental to the semantics of my application.</li>
+<li>The <code>next</code> type represents the next action in your program. If an operation can’t have a logical “next step” (<code>TerminateApplication</code>, for example), then you should just define the type without a <code>next</code> parameter.</li>
+</ul>
+<h2 id="step-2-functorizing">Step 2: Functorizing</h2>
+<p>Now we need to turn our operation type into a functor:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">DcNodeOperator</span> state error next) <span class="kw">where</span>
+  fmap f (<span class="dt">InitState</span> next) <span class="fu">=</span> <span class="dt">InitState</span> (f next)
+  fmap f (<span class="dt">AwaitStateCondition</span> g h) <span class="fu">=</span> <span class="dt">AwaitStateCondition</span> g (f <span class="fu">.</span> h)
+  fmap f (<span class="dt">GetState</span> g) <span class="fu">=</span> <span class="dt">GetState</span> (f <span class="fu">.</span> g)
+<span class="co">-- ....and so on</span></code></pre></div>
+<p>This is rather mundane, mechanical work, so let’s get the compiler to do it for us by turning on the <code>DeriveFunctor</code> extension:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE DeriveFunctor #-}</span>
+<span class="kw">data</span> <span class="dt">DcNodeOperator</span> state error next <span class="fu">=</span>
+    <span class="dt">InitState</span> next
+  <span class="fu">|</span> <span class="dt">AwaitStateCondition</span> (state <span class="ot">-&gt;</span> <span class="dt">Bool</span>) (state <span class="ot">-&gt;</span> next)
+  <span class="co">--etc</span>
+  <span class="kw">deriving</span> (<span class="dt">Functor</span>)</code></pre></div>
+<h2 id="step-3-create-the-operation-functions">Step 3: Create the operation functions</h2>
+<p>Now we create functions to conveniently call<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> our operations:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Control.Monad.Free</span>
+
+<span class="ot">initState ::</span> <span class="dt">Free</span> (<span class="dt">DcNodeOperator</span> state error) ()
+initState <span class="fu">=</span> <span class="dt">Free</span> (<span class="dt">InitServer</span> state error (<span class="dt">Pure</span> ()))
+
+<span class="ot">getState ::</span> <span class="dt">Free</span> (<span class="dt">GetState</span> state error) state
+getState <span class="fu">=</span> <span class="dt">Free</span> (<span class="dt">GetState</span> state error) id
+<span class="co">-- etc</span></code></pre></div>
+<p>This is also rather mundane, mechanical work, so we can use a bit of Template Haskell to create all the functions for us:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE TemplateHaskell #-}</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Free.TH</span>
+
+makeFree <span class="ch">''</span><span class="dt">DcNodeOperator</span></code></pre></div>
+<h2 id="step-4-create-the-monad-instance">Step 4: Create the monad instance</h2>
+<p>Now we should pass some types to <code>DcPeerOperator</code> and give it a type alias:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">DcPeerOperator</span> <span class="fu">=</span> <span class="dt">DcNodeOperator</span> <span class="dt">PeerState</span> <span class="dt">PeerError</span></code></pre></div>
+<p>and define the free monad over the newly created <code>DcPeerOperator</code> type:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">DcPeer</span> <span class="fu">=</span> <span class="dt">Free</span> <span class="dt">DcPeerOperator</span></code></pre></div>
+<h2 id="step-5-write-your-application-in-your-dsl">Step 5: Write your application in your DSL</h2>
+<p>Let’s put it all together and see what we’ve got so far:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE DeriveFunctor, TemplateHaskell #-}</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.Free</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Free.TH</span>
+
+<span class="kw">data</span> <span class="dt">DcNodeOperator</span> state error next <span class="fu">=</span>
+    <span class="dt">InitState</span> next
+  <span class="fu">|</span> <span class="dt">AwaitStateCondition</span> (state <span class="ot">-&gt;</span> <span class="dt">Bool</span>) (state <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">GetState</span> (state <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">GetUserInput</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">ModifyState</span> (state <span class="ot">-&gt;</span> state) next
+  <span class="fu">|</span> <span class="dt">DisplayMessage</span> <span class="dt">String</span> next
+  <span class="fu">|</span> <span class="dt">GetRandomInt</span> <span class="dt">Int</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> next)
+  <span class="fu">|</span> <span class="dt">Throw</span> error next
+  <span class="kw">deriving</span> (<span class="dt">Functor</span>)
+
+makeFree <span class="ch">''</span><span class="dt">DcNodeOperator</span>
+
+<span class="kw">data</span> <span class="dt">PeerError</span> <span class="fu">=</span>  <span class="dt">ServerDisconnected</span> <span class="fu">|</span> <span class="dt">ServerTimeout</span> <span class="fu">|</span> <span class="dt">InvalidPeerState</span> <span class="kw">deriving</span> (<span class="dt">Show</span>)
+<span class="kw">data</span> <span class="dt">PeerState</span> <span class="fu">=</span> <span class="dt">PeerState</span> {<span class="ot"> peers ::</span> [<span class="dt">Peer</span>], listenPort<span class="fu">:</span> <span class="dt">Port</span>,<span class="ot"> peerId ::</span> <span class="dt">String</span>  }
+
+<span class="kw">type</span> <span class="dt">DcPeerOperator</span> <span class="fu">=</span> <span class="dt">DcNodeOperator</span> <span class="dt">PeerState</span> <span class="dt">PeerError</span>
+
+<span class="kw">type</span> <span class="dt">DcPeer</span> <span class="fu">=</span> <span class="dt">Free</span> <span class="dt">DcPeerOperator</span></code></pre></div>
+<p>Believe it or not, this is all we need to start writing in our DSL<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>! Here’s what a simple program in our DSL looks like (ignore the <code>.~</code> and <code>^.</code> if you’re not familiar with lenses):</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">initPeer ::</span> <span class="dt">DcPeer</span> ()
+initPeer <span class="fu">=</span> <span class="kw">do</span>
+  initState
+  displayMessage <span class="st">"What port do you want?"</span>
+  enteredPort <span class="ot">&lt;-</span> getUserInput
+  modifyState <span class="fu">$</span> port <span class="fu">.~</span> (parse enteredPort)
+  state <span class="ot">&lt;-</span> getState
+  displayMessage <span class="fu">$</span> <span class="st">"Using port: "</span> <span class="fu">++</span> show state <span class="fu">^.</span> port
+
+<span class="ot">awaitPeers ::</span> <span class="dt">DcPeer</span> [<span class="dt">Participant</span>]
+awaitPeers <span class="fu">=</span> <span class="kw">do</span>
+  state <span class="ot">&lt;-</span> awaitStateCondition <span class="fu">$</span> (<span class="fu">&gt;</span> <span class="dv">1</span>) <span class="fu">.</span> numPeers
+  return <span class="fu">$</span> state <span class="fu">^.</span> peers</code></pre></div>
+<p>Notice that we are free to start writing our program without worrying at all about the implementation! These functions we’ve defined return a <code>DcPeer</code>, which is a monad, so we can easily compose them into larger functions:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">peerProgram ::</span> <span class="dt">DcPeer</span> ()
+peerProgram <span class="fu">=</span> <span class="kw">do</span>
+  initPeer
+  peers <span class="ot">&lt;-</span> awaitPeers
+  displayMessage <span class="fu">$</span> <span class="st">"Peers: "</span> <span class="fu">++</span> show peers</code></pre></div>
+<p><code>awaitPeers</code> looks just like it was defined as a fundamental operation, which is why you shouldn’t define an operation if it can be produced from the composition of simpler ones. Happily, all these functions are entirely pure; they don’t actually <em>do</em> anything except store all the operations into a value that can be interpreted later.</p>
+<h2 id="step-6-write-an-interpreter">Step 6: Write an interpreter</h2>
+<p>So now we need to create an interpreter for our free monad. Fortunately, even though we can go crazy and create large, complex programs with our DSL, we only need to write one interpreter function for each operation.</p>
+<p>We need to pick a monad type that we want to “translate” our free monad into. Let’s pick something simple for this example:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">DcPeerIO</span><span class="ot"> ::</span> <span class="dt">StateT</span> (<span class="dt">PeerState</span>) <span class="dt">IO</span></code></pre></div>
+<p>Now we just map every possible operation of <code>DcPeerOperator</code> to this type:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">peerInterpreter ::</span> <span class="dt">DcPeerOperator</span> (<span class="dt">DcPeerIO</span> next) <span class="ot">-&gt;</span> <span class="dt">DcPeerIO</span> next
+peerInterpreter (<span class="dt">GetUserInput</span> next) <span class="fu">=</span> <span class="kw">do</span>
+  userInput <span class="ot">&lt;-</span> liftIO getLine
+  next userInput
+peerInterpreter (<span class="dt">GetState</span> next) <span class="fu">=</span> get <span class="fu">&gt;&gt;=</span> next
+peerInterpreter (<span class="dt">DisplayMessage</span> m next) <span class="fu">=</span> <span class="kw">do</span>
+  liftIO <span class="fu">$</span> putStrLn m
+  next
+peerInterpreter (<span class="dt">GetRandomInt</span> max next) <span class="fu">=</span> <span class="kw">do</span>
+  num <span class="ot">&lt;-</span> liftIO <span class="fu">$</span> getRandomNumber max
+  next num
+<span class="co">-- etc</span></code></pre></div>
+<h2 id="step-7-run-your-program">Step 7: Run your program</h2>
+<p>Once we do that, we can pass any <code>DcPeer ()</code> to the interpreter and it’ll interpret it:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">initialState <span class="fu">=</span> <span class="dt">PeerState</span> [] <span class="dv">0</span> <span class="st">""</span>
+
+runPeer <span class="fu">=</span> runStateT (iterM peerInterpreter <span class="fu">$</span> peerProgram) initialState</code></pre></div>
+<p><code>iterM</code> recursively calls the interpreter for every “line” written in our DSL.</p>
+<h2 id="what-have-we-gained">What have we gained?</h2>
+<p>It’s a really quite painless to refactor applications in this way, and I think it buys you two main benefits:</p>
+<h3 id="flexibility">Flexibility</h3>
+<p>Because you only need to write interpreters that cover the core operations of your application, you can completely refactor your implementation by just changing your interpreter. I moved from using the state monad to STM extremely easily, because references to the state monad weren’t scattered all over the codebase; there were only a few places in the interpreter that I needed to change.</p>
+<p>And because writing interpreters is so easy, you can keep the old interpreter, and write a completely new one, allowing you to make completely different implementations of the same application semantics! We could, for instance, create a web application just by writing a different interpreter, so instead of:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">peerInterpreter (<span class="dt">DisplayMessage</span> m next) <span class="fu">=</span> <span class="kw">do</span>
+  liftIO <span class="fu">$</span> putStrLn m</code></pre></div>
+<p>we can write</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">webPeerInterpreter (<span class="dt">DisplayMessage</span> m next) <span class="fu">=</span> <span class="kw">do</span>
+  liftIO <span class="fu">$</span> displayWebMessage m</code></pre></div>
+<p>or a debugging/testing interpreter</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">debugInterpreter (<span class="dt">GetUserInput</span> next) <span class="fu">=</span> <span class="kw">do</span>
+  randInput <span class="ot">&lt;-</span> liftIO getRandomString
+  liftIO <span class="fu">$</span> putStrLn <span class="st">"User input requested, generated: "</span> <span class="fu">++</span> randInput
+  next randInput</code></pre></div>
+<h4 id="purity">Purity</h4>
+<p>Even though programs written in a free monad DSL can look imperative, they’re actually completely pure. Every line in the DSL just wraps the monad with another layer of <code>Free</code>.</p>
+<p>So now there’s just one place where we do all our dangerous IO stuff- but that isn’t the biggest advantage. You actually end up writing <em>less</em> IO code, because only your operations need to be interpreted.</p>
+<p>There’s something beautiful about being able to write extremely large programs in a completely pure DSL, and then having the freedom to map the resulting program onto an arbitrary monad with arbitrary side effects, simply by interpreting operations. It means that the amount of IO code in your programs scales with the size of your DSL rather than the size of the program, which can turn out to be a huge difference.</p>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Using a very dodgy, hand-rolled version of Chuam’s dining cryptographers protocol.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Not to bash Java, et al. It’s just that thinking in one language and “translating” it into another language tends to produce poor code in proportion to the size of the difference between the “thinking language” and the “writing language”. And Java and Haskell are Very Different.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>In this context, “calling” the operation simply means wrapping it up in a <code>Free</code>.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>This is a big advantage to using the free monad. While you could implement the DSL yourself, there’s a lot of places you can mess up. A lot of work has been done to make free monad DSLs rather quick and painless.<a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+
+<div class="info">
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script type="text/javascript" src="../css/footnote.js"></script>
+
+
+
+
+        <div id="footer">
+          <small>Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a></small>
+        </div>
+      </div>
+    </article>
+    </main>
+  
+
+</body></html>
